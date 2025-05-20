@@ -12,11 +12,19 @@ typedef struct{
 } Orang;
 
 // Deklarasi fungsi, silahkan tambahkan parameternya bila perlu  
+//Function Klasifikasi
+KlasifikasiEmisi klasifikasiEmisi(float emisi);
+const char* getKlasifikasiLabel(KlasifikasiEmisi klas);   
+void displayKlasifikasi(KlasifikasiEmisi klas);
+
+//Function Perhitungan
 float hitungTransportasi();
 float hitungPenerbangan();
 float hitungListrik();
 float hitungPeralatan();
 float hitungMakanan();
+
+//Function Display
 void displayTips();
 void displayLeaderboard(Orang *data, int jumlah);
 
@@ -44,13 +52,13 @@ int main() {
         
         float total = emisiTransportasi + emisiPenerbangan + emisiListrik + emisiPeralatan + emisiMakanan;
         (ptrOrang + i)->totalEmisi = total;
-        // (ptrOrang + i)->klasTotalEmisi = ...;
+        (ptrOrang + i)->klasTotalEmisi = klasifikasiEmisi(total);
         
         printf("\nTotal Emisi %s: %.2f Ton CO2/tahun\n", ptrOrang[i].nama, total);
         displayTips();
     }
 
-    printf("\n========== LEADERBOARD JEJAK KARBON ==========\n");
+    printf("\n=================== LEADERBOARD JEJAK KARBON ===================\n");
     displayLeaderboard(ptrOrang, n);
 
     free(ptrOrang);
@@ -58,3 +66,57 @@ int main() {
 }
 
 // Buat definisi tiap function di bawah sini
+
+KlasifikasiEmisi klasifikasiEmisi(float emisi){
+    if (emisi < 2.0){
+        return RENDAH;
+    }else if (emisi < 4.0){
+        return NORMAL;
+    }else {
+        return TINGGI;
+    }
+}
+
+const char* getKlasifikasiLabel(KlasifikasiEmisi klas){
+    switch (klas){
+        case RENDAH: return "Rendah";
+        case NORMAL: return "Normal";
+        case TINGGI: return "Tinggi";
+        default: return "Tidak diketahui";
+    }
+}
+
+void displayKlasifikasi(KlasifikasiEmisi klas){
+    switch(klas){
+        case RENDAH:
+            printf("Rendah \n");
+            break;
+        case NORMAL:
+            printf("Normal \n");
+            break;
+        case TINGGI:
+            printf("Tinggi \n");
+            break;
+        default:
+            printf("Tidak diketahui\n");
+    }
+}
+
+void displayLeaderboard(Orang *data, int jumlah) {
+    for (int i = 0; i < jumlah - 1; i++) {
+        for (int j = i + 1; j < jumlah; j++) {
+            if (data[i].totalEmisi > data[j].totalEmisi) {
+                Orang temp = data[i];
+                data[i] = data[j];
+                data[j] = temp;
+            }
+        }
+    }
+
+    printf("Peringkat | Nama                | Emisi (Ton CO2) | Klasifikasi\n");
+    printf("---------------------------------------------------------------\n");
+    for (int i = 0; i < jumlah; i++) {
+        printf("   %2d     | %-20s|     %6.2f      | ", i + 1, data[i].nama, data[i].totalEmisi);
+		displayKlasifikasi(data[i].klasTotalEmisi);
+    }
+}                                                                                                
