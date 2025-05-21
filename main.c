@@ -48,7 +48,6 @@ const char* getKlasifikasiLabel(KlasifikasiEmisi klas);
 
 //Function Perhitungan
 float hitungTransportasi();
-float hitungPenerbangan();
 float hitungListrik(EmisiListrik *dayaListrik, SumberListrik *sumberEnergi, JumlahListrik *listrik, int i);
 float hitungPeralatan();
 float hitungMakanan();
@@ -81,12 +80,11 @@ int main() {
         scanf("%[^\n]s", (ptrOrang + i)->nama);
         
         float emisiTransportasi = hitungTransportasi();
-        float emisiPenerbangan = hitungPenerbangan();
         float emisiListrik = hitungListrik(dayaListrik, sumberEnergi, listrik, i);
         float emisiPeralatan = hitungPeralatan();
         float emisiMakanan = hitungMakanan();
         
-        float total = emisiTransportasi + emisiPenerbangan + emisiListrik + emisiPeralatan + emisiMakanan;
+        float total = emisiTransportasi + emisiListrik + emisiPeralatan + emisiMakanan;
         (ptrOrang + i)->totalEmisi = total;
         (ptrOrang + i)->klasTotalEmisi = klasifikasiEmisi(total);
         
