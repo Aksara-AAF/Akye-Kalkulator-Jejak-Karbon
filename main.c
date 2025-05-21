@@ -80,8 +80,8 @@ int main() {
         getchar();
         scanf("%[^\n]s", (ptrOrang + i)->nama);
         
-        float emisiTransportasi = 0;
-        float emisiPenerbangan = 0;
+        float emisiTransportasi = hitungTransportasi();
+        float emisiPenerbangan = hitungPenerbangan();
         float emisiListrik = hitungListrik(dayaListrik, sumberEnergi, listrik, i);
         float emisiPeralatan = hitungPeralatan();
         float emisiMakanan = hitungMakanan();
