@@ -1,5 +1,6 @@
 #include <stdio.h>
 #include <stdlib.h>
+#include <time.h>
 
 typedef enum {
     RENDAH, NORMAL, TINGGI
@@ -39,7 +40,6 @@ typedef struct {
 //Function Klasifikasi
 KlasifikasiEmisi klasifikasiEmisi(float emisi);
 const char* getKlasifikasiLabel(KlasifikasiEmisi klas);   
-void displayKlasifikasi(KlasifikasiEmisi klas);
 
 //Function Perhitungan
 float hitungTransportasi();
@@ -49,13 +49,15 @@ float hitungPeralatan();
 float hitungMakanan();
 
 //Function Display
+void displayKlasifikasi(KlasifikasiEmisi klas);
 void displayTips();
 void displayLeaderboard(Orang *data, int jumlah);
 
 int main() {
+    int i, n;
     printf("========== KALKULATOR JEJAK KARBON ==========\n");
+    srand(time(NULL));
 
-    int n, i;
     printf("Berapa jumlah orang yang mau mengisi? ");
     scanf("%d", &n);
     
@@ -65,7 +67,7 @@ int main() {
     EmisiListrik dayaListrik[i];
     SumberListrik sumberEnergi[i];
     JumlahListrik listrik[i];
-
+  
     for (i = 0; i < n; i++){
         printf("\n=== Orang ke-%d ===\n", i+1);
         printf("Nama : ");
@@ -83,7 +85,12 @@ int main() {
         (ptrOrang + i)->klasTotalEmisi = klasifikasiEmisi(total);
         
         printf("\nTotal Emisi %s: %.2f Ton CO2/tahun\n", ptrOrang[i].nama, total);
-        displayTips();
+        if ((ptrOrang + i)->klasTotalEmisi == RENDAH){
+        	printf("Bagus Pertahankan!\n");
+		}else{
+			displayTips();
+		}
+
     }
 
     printf("\n=================== LEADERBOARD JEJAK KARBON ===================\n");
@@ -96,9 +103,9 @@ int main() {
 // Buat definisi tiap function di bawah sini
 
 KlasifikasiEmisi klasifikasiEmisi(float emisi){
-    if (emisi < 2.0){
+    if (emisi < 5.0){
         return RENDAH;
-    }else if (emisi < 4.0){
+    }else if (emisi < 20.0){
         return NORMAL;
     }else {
         return TINGGI;
@@ -130,9 +137,29 @@ void displayKlasifikasi(KlasifikasiEmisi klas){
     }
 }
 
+void displayTips(){
+    const char *tips[] = {
+        "Kurangi penggunaan kendaraan bermotor pribadi.",
+        "Gunakan transportasi umum atau sepeda.",
+        "Matikan lampu dan peralatan listrik saat tidak digunakan.",
+        "Gunakan peralatan hemat energi.",
+        "Kurangi konsumsi daging merah.",
+        "Belilah produk lokal dan musiman.",
+        "Gunakan air dengan bijak, hindari pemborosan.",
+        "Daur ulang sampah yang bisa digunakan kembali.",
+        "Gunakan tas belanja yang dapat digunakan ulang.",
+        "Tanam pohon atau tanaman di sekitar rumah."
+    };
+
+    int jumlahTips = sizeof(tips) / sizeof(tips[0]);
+    int index = rand() % jumlahTips;
+    printf("Tips: %s\n", tips[index]);
+}
+
 void displayLeaderboard(Orang *data, int jumlah) {
-    for (int i = 0; i < jumlah - 1; i++) {
-        for (int j = i + 1; j < jumlah; j++) {
+    int i,j;
+    for (i = 0; i < jumlah - 1; i++) {
+        for (j = i + 1; j < jumlah; j++) {
             if (data[i].totalEmisi > data[j].totalEmisi) {
                 Orang temp = data[i];
                 data[i] = data[j];
@@ -141,11 +168,11 @@ void displayLeaderboard(Orang *data, int jumlah) {
         }
     }
 
-    printf("Peringkat | Nama                | Emisi (Ton CO2) | Klasifikasi\n");
-    printf("---------------------------------------------------------------\n");
-    for (int i = 0; i < jumlah; i++) {
-        printf("   %2d     | %-20s|     %6.2f      | ", i + 1, data[i].nama, data[i].totalEmisi);
-		displayKlasifikasi(data[i].klasTotalEmisi);
+    printf("Peringkat | Nama                 | Emisi (Ton CO2)| Klasifikasi\n");
+    printf("----------------------------------------------------------------\n");
+    for (i = 0; i < jumlah; i++) {
+        printf("   %2d     | %-20s |%6.2f          |  ", i + 1, data[i].nama, data[i].totalEmisi);
+        displayKlasifikasi(data[i].klasTotalEmisi);
     }
 }
 
