@@ -63,12 +63,13 @@ int main() {
     
     Orang *ptrOrang;
     ptrOrang = (Orang*) malloc(n * sizeof(Orang));
-
-    EmisiListrik dayaListrik[i];
-    SumberListrik sumberEnergi[i];
-    JumlahListrik listrik[i];
   
     for (i = 0; i < n; i++){
+        
+        EmisiListrik dayaListrik[i];
+        SumberListrik sumberEnergi[i];
+        JumlahListrik listrik[i];
+
         printf("\n=== Orang ke-%d ===\n", i+1);
         printf("Nama : ");
         getchar();
