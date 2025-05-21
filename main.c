@@ -29,6 +29,7 @@ void displayTips();
 void displayLeaderboard(Orang *data, int jumlah);
 
 int main() {
+    int i;
     printf("========== KALKULATOR JEJAK KARBON ==========\n");
 
     int n;
@@ -38,7 +39,7 @@ int main() {
     Orang *ptrOrang;
     ptrOrang = (Orang*) malloc(n * sizeof(Orang));
 
-    for (int i = 0; i < n; i++){
+    for (i = 0; i < n; i++){
         printf("\n=== Orang ke-%d ===\n", i+1);
         printf("Nama : ");
         getchar();
@@ -103,8 +104,9 @@ void displayKlasifikasi(KlasifikasiEmisi klas){
 }
 
 void displayLeaderboard(Orang *data, int jumlah) {
-    for (int i = 0; i < jumlah - 1; i++) {
-        for (int j = i + 1; j < jumlah; j++) {
+    int i,j;
+    for (i = 0; i < jumlah - 1; i++) {
+        for (j = i + 1; j < jumlah; j++) {
             if (data[i].totalEmisi > data[j].totalEmisi) {
                 Orang temp = data[i];
                 data[i] = data[j];
@@ -113,10 +115,10 @@ void displayLeaderboard(Orang *data, int jumlah) {
         }
     }
 
-    printf("Peringkat | Nama                | Emisi (Ton CO2) | Klasifikasi\n");
-    printf("---------------------------------------------------------------\n");
-    for (int i = 0; i < jumlah; i++) {
-        printf("   %2d     | %-20s|     %6.2f      | ", i + 1, data[i].nama, data[i].totalEmisi);
-		displayKlasifikasi(data[i].klasTotalEmisi);
+    printf("Peringkat | Nama                 | Emisi (Ton CO2)| Klasifikasi\n");
+    printf("------------------------------------------------------------------\n");
+    for (i = 0; i < jumlah; i++) {
+        printf("   %2d     | %-20s |%6.2f          |  ", i + 1, data[i].nama, data[i].totalEmisi);
+        displayKlasifikasi(data[i].klasTotalEmisi);
     }
 }                                                                                                
