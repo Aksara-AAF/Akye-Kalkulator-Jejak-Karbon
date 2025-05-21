@@ -36,6 +36,11 @@ typedef struct {
 } EmisiListrik;
 
 
+typedef struct{
+    char namaMakanan[30];
+    float emisiPerPorsi; // dalam kg CO2, dan satu porsi = 100 gr 
+} Makanan;
+
 // Deklarasi fungsi, silahkan tambahkan parameternya bila perlu  
 //Function Klasifikasi
 KlasifikasiEmisi klasifikasiEmisi(float emisi);
@@ -132,7 +137,7 @@ float hitungPeralatan()
     float jml_led, jam_led;
     float daya_lampu, emisi_lampu = 0;
 
-    printf("=== Peralatan Lampu ===\n");
+    printf("\n=== Peralatan Lampu ===\n");
     printf("Lampu apa yang Anda gunakan?\n1. Pijar\n2. Neon\n3. Led\n");
     printf("Pilih 1-3: ");
     scanf("%d", &pilih_lampu);
@@ -190,7 +195,7 @@ float hitungPeralatan()
     emisi_kulkas = (daya_kulkas * 24 * 365 * 0.9) / 1000000;
 
     float total_emisi = emisi_lampu + emisi_ac + emisi_kulkas;
-    printf("\nTotal emisi dari peralatan rumah tangga: %.3f Ton CO2/tahun\n", total_emisi);
+    printf("\nEmisi Karbon dari Peralatan Rumah Tangga: %.3f Ton CO2/tahun\n", total_emisi);
     return total_emisi;
 }
 
@@ -321,4 +326,40 @@ void displayLeaderboard(Orang *data, int jumlah) {
         printf("   %2d     | %-20s |%6.2f          |  ", i + 1, data[i].nama, data[i].totalEmisi);
         displayKlasifikasi(data[i].klasTotalEmisi);
     }
+}
+
+float hitungMakanan(){
+    // Assign nama makanan serta emisi per porsinya
+    Makanan daftarMakanan[11] = {
+        {"Kentang", 0.046},
+        {"Pisang", 0.086},
+        {"Nasi", 0.445},
+        {"Telur", 0.467},
+        {"Keju", 2.388},
+        {"Susu", 0.315},
+        {"Daging Sapi", 3.330},
+        {"Daging Domba", 3.972},
+        {"Daging Babi", 1.231},
+        {"Daging Unggas", 0.987},
+        {"Udang", 2.687}
+    };
+
+    int frekuensi[11], i;
+    float totalEmisiMakanan = 0;
+
+    printf("\n=== Hitung Emisi Makanan ===\n");
+    printf("Masukkan frekuensi konsumsi tiap makanan per minggu (0-21):\n");
+    
+    for (i = 0; i < 11; i++){
+        printf("%s : ", daftarMakanan[i].namaMakanan);
+        scanf("%d", &frekuensi[i]);
+        
+        float konsumsiTahunan = frekuensi[i] * 52; // 52 minggu per tahun
+        float emisiTahunan = konsumsiTahunan * daftarMakanan[i].emisiPerPorsi;
+        totalEmisiMakanan += emisiTahunan;
+    }
+
+    totalEmisiMakanan /= 1000; // Konversi dari kg CO2/tahun menjadi Ton CO2/tahun
+    printf("Emisi Karbon dari Makanan : %.3f Ton CO2/tahun\n", totalEmisiMakanan);
+    return totalEmisiMakanan;
 }
