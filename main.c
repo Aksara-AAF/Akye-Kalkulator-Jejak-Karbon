@@ -80,8 +80,8 @@ int main() {
         getchar();
         scanf("%[^\n]s", (ptrOrang + i)->nama);
         
-        float emisiTransportasi = hitungTransportasi();
-        float emisiPenerbangan = hitungPenerbangan();
+        float emisiTransportasi = 0;
+        float emisiPenerbangan = 0;
         float emisiListrik = hitungListrik(dayaListrik, sumberEnergi, listrik, i);
         float emisiPeralatan = hitungPeralatan();
         float emisiMakanan = hitungMakanan();
@@ -137,7 +137,7 @@ float hitungPeralatan()
     float jml_led, jam_led;
     float daya_lampu, emisi_lampu = 0;
 
-    printf("=== Peralatan Lampu ===\n");
+    printf("\n=== Peralatan Lampu ===\n");
     printf("Lampu apa yang Anda gunakan?\n1. Pijar\n2. Neon\n3. Led\n");
     printf("Pilih 1-3: ");
     scanf("%d", &pilih_lampu);
@@ -195,7 +195,7 @@ float hitungPeralatan()
     emisi_kulkas = (daya_kulkas * 24 * 365 * 0.9) / 1000000;
 
     float total_emisi = emisi_lampu + emisi_ac + emisi_kulkas;
-    printf("\nTotal emisi dari peralatan rumah tangga: %.3f Ton CO2/tahun\n", total_emisi);
+    printf("\nEmisi Karbon dari Peralatan Rumah Tangga: %.3f Ton CO2/tahun\n", total_emisi);
     return total_emisi;
 }
 
