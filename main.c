@@ -239,7 +239,7 @@ float hitungListrik(EmisiListrik *dayaListrik, SumberListrik *sumberEnergi, Juml
             listrik[i].pln = dayaBulan;
             dayaListrik[i].totalEmisiListrik = listrik[i].pln*0.01*0.984;
             printf("Emisi Karbon dari Daya Rumah Tangga: %.3f Ton CO2/tahun\n", dayaListrik[i].totalEmisiListrik/dayaListrik[i].orgRumah);
-            return listrik[i].pln/dayaListrik[i].orgRumah;
+            return dayaListrik[i].totalEmisiListrik/dayaListrik[i].orgRumah;
         
         case BERSIH:
             printf("Berapa banyak listrik yang dihasilkan sumber energi bersih (dalam kWh)? ");
@@ -267,7 +267,7 @@ float hitungListrik(EmisiListrik *dayaListrik, SumberListrik *sumberEnergi, Juml
             listrik[i].hybrid = dayaBulan+dayaBersih*0;
             dayaListrik[i].totalEmisiListrik = listrik[i].hybrid*0.01*0.984;
             printf("Emisi Karbon dari Daya Rumah Tangga: %.3f Ton CO2/tahun\n", dayaListrik[i].totalEmisiListrik/dayaListrik[i].orgRumah);
-            return listrik[i].hybrid/dayaListrik[i].orgRumah;
+            return dayaListrik[i].totalEmisiListrik/dayaListrik[i].orgRumah;
         default:
             return 0;
         }
