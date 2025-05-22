@@ -225,47 +225,50 @@ float hitungListrik(EmisiListrik *dayaListrik, SumberListrik *sumberEnergi, Juml
     
     switch(sumberEnergi[i]) {
         case PLN:
-        printf("Berapa daya yang terpasang (Watt)? ");
-        printf("\n1. 450 Watt\n2. 900 Watt\n3. 1300 Watt\n4. 2200 Watt\n5. 3500 Watt\n6. 5500 Watt\n7. >6600 Watt\n");
-        scanf("%d", &dayaListrik[i].kategoriDaya);
-        printf("Berapa tagihan listrik per bulan (Rp)? ");
-        scanf("%d", &dayaListrik[i].tagihanListrik);
-        if (dayaListrik[i].kategoriDaya < 3) {
-            dayaBulan = dayaListrik[i].tagihanListrik / 1352.00;
-        }
-        else if (dayaListrik[i].kategoriDaya >= 3) {
-            dayaBulan = dayaListrik[i].tagihanListrik / 1445.00;
-        }
-        listrik[i].pln = dayaBulan;
-        dayaListrik[i].totalEmisiListrik = listrik[i].pln*0.01*0.984;
-        printf("Emisi Karbon dari Daya Rumah Tangga: %.3f Ton CO2/tahun\n", dayaListrik[i].totalEmisiListrik);;
-        return listrik[i].pln/dayaListrik[i].orgRumah;
-        case BERSIH:
-        printf("Berapa banyak listrik yang dihasilkan sumber energi bersih (dalam kWh)? ");
-        scanf("%f", &dayaBersih);
-        listrik[i].bersih = dayaBersih;
-        dayaListrik[i].totalEmisiListrik = listrik[i].bersih*0;
-        printf("Emisi Karbon dari Daya Rumah Tangga: %.3f Ton CO2/tahun\n", dayaListrik[i].totalEmisiListrik);
-        return dayaListrik[i].totalEmisiListrik;
-        case HYBRID:
-        printf("Berapa daya yang terpasang (Watt)?");
-        printf("\n1. 450 Watt\n2. 900 Watt\n3. 1300 Watt\n4. 2200 Watt\n5. 3500 Watt\n6. 5500 Watt\n7. >6600 Watt\n");
-        scanf("%d", &dayaListrik[i].kategoriDaya);
-        printf("Berapa tagihan listrik per bulan (Rp)? ");
-        scanf("%d", &dayaListrik[i].tagihanListrik);
-        if (dayaListrik[i].kategoriDaya < 3) {
-            dayaBulan = dayaListrik[i].tagihanListrik / 1352.00;
-        }
-        else if (dayaListrik[i].kategoriDaya >= 3) {
-            dayaBulan = dayaListrik[i].tagihanListrik / 1445.00;
+            printf("Berapa daya yang terpasang (Watt)? ");
+            printf("\n1. 450 Watt\n2. 900 Watt\n3. 1300 Watt\n4. 2200 Watt\n5. 3500 Watt\n6. 5500 Watt\n7. >6600 Watt\n");
+            scanf("%d", &dayaListrik[i].kategoriDaya);
+            printf("Berapa tagihan listrik per bulan (Rp)? ");
+            scanf("%d", &dayaListrik[i].tagihanListrik);
+            if (dayaListrik[i].kategoriDaya < 3) {
+                dayaBulan = dayaListrik[i].tagihanListrik / 1352.00;
             }
+            else if (dayaListrik[i].kategoriDaya >= 3) {
+                dayaBulan = dayaListrik[i].tagihanListrik / 1445.00;
+            }
+            listrik[i].pln = dayaBulan;
+            dayaListrik[i].totalEmisiListrik = listrik[i].pln*0.01*0.984;
+            printf("Emisi Karbon dari Daya Rumah Tangga: %.3f Ton CO2/tahun\n", dayaListrik[i].totalEmisiListrik/dayaListrik[i].orgRumah);
+            return listrik[i].pln/dayaListrik[i].orgRumah;
+        
+        case BERSIH:
+            printf("Berapa banyak listrik yang dihasilkan sumber energi bersih (dalam kWh)? ");
+            scanf("%f", &dayaBersih);
+            listrik[i].bersih = dayaBersih;
+            dayaListrik[i].totalEmisiListrik = listrik[i].bersih*0;
+            printf("Emisi Karbon dari Daya Rumah Tangga: %.3f Ton CO2/tahun\n", dayaListrik[i].totalEmisiListrik/dayaListrik[i].orgRumah);
+            return dayaListrik[i].totalEmisiListrik;
+    
+        case HYBRID:
+            printf("Berapa daya yang terpasang (Watt)?");
+            printf("\n1. 450 Watt\n2. 900 Watt\n3. 1300 Watt\n4. 2200 Watt\n5. 3500 Watt\n6. 5500 Watt\n7. >6600 Watt\n");
+            scanf("%d", &dayaListrik[i].kategoriDaya);
+            printf("Berapa tagihan listrik per bulan (Rp)? ");
+            scanf("%d", &dayaListrik[i].tagihanListrik);
+            if (dayaListrik[i].kategoriDaya < 3) {
+                dayaBulan = dayaListrik[i].tagihanListrik / 1352.00;
+            }
+            else if (dayaListrik[i].kategoriDaya >= 3) {
+                dayaBulan = dayaListrik[i].tagihanListrik / 1445.00;
+            }
+
             printf("Berapa banyak listrik yang dihasilkan sumber energi bersih (dalam kWh)? ");
             scanf("%f", &dayaBersih);
             listrik[i].hybrid = dayaBulan+dayaBersih*0;
             dayaListrik[i].totalEmisiListrik = listrik[i].hybrid*0.01*0.984;
-            printf("Emisi Karbon dari Daya Rumah Tangga: %.3f Ton CO2/tahun\n", dayaListrik[i].totalEmisiListrik);
+            printf("Emisi Karbon dari Daya Rumah Tangga: %.3f Ton CO2/tahun\n", dayaListrik[i].totalEmisiListrik/dayaListrik[i].orgRumah);
             return listrik[i].hybrid/dayaListrik[i].orgRumah;
-            default:
+        default:
             return 0;
         }
     }
@@ -425,6 +428,6 @@ float hitungTransportasi() {
     emisiUdara = trip * dist * 0.000156 * bbm;
     printf("Emisi Karbon dari Kendaraan Udara: %.3f Ton CO2/tahun\n", emisiUdara);
     emisi = emisiDarat + emisiUdara;
-    printf("\nTotal Emisi Karbon dari Kedua Tipe Kendaraan: %.3f Ton CO2/Tahun", emisi);
+    printf("\nTotal Emisi Karbon dari Kedua Tipe Kendaraan: %.3f Ton CO2/Tahun\n", emisi);
     return emisi;
 }
