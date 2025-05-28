@@ -124,6 +124,178 @@ const char* getKlasifikasiLabel(KlasifikasiEmisi klas){
     }
 }
 
+float hitungTransportasi() {
+	int choice, vehicle, bbm, dist, trip;
+    float x = 0, emisi = 0, emisiDarat = 0, emisiUdara = 0;
+           
+	printf("Kendaraan apa yang digunakan?\n1. Mobil\n2. Motor\n");
+    scanf("%d", &vehicle);
+    do{
+		switch(vehicle){
+	    	case 1:
+	            printf("Bahan bakar apa yang digunakan?\n1. Bensin\n2. Listrik\n");
+	            scanf("%d", &bbm);
+	            if(bbm == 1) x = 0.08760;
+	            else if(bbm == 2) x = 0.03053;
+	            else {
+	                printf("Bahan tidak terdaftar, mohon coba lagi.\n");
+	                printf("Bahan bakar apa yang digunakan?\n1. Bensin\n2. Listrik\n");
+	            	scanf("%d", &bbm);
+	            }
+	            printf("Berapa jarak yang ditempuh per hari (KM/Hari)? ");
+	            scanf("%d", &dist);
+	            emisiDarat = dist * x;
+	            break;
+			case 2:
+	            printf("Bahan bakar apa yang digunakan?\n1. Bensin\n2. Listrik\n");
+	            scanf("%d", &bbm);
+	            do{
+					
+		            if(bbm == 1) x = 0.03503;
+		            else if(bbm == 2) x = 0.0213;
+		            else {
+		                printf("Bahan tidak terdaftar, mohon coba lagi.\n");
+		                printf("Bahan bakar apa yang digunakan?\n1. Bensin\n2. Listrik\n");
+		            	scanf("%d", &bbm);
+		            }
+		        }while(bbm != 1 && bbm != 2);
+	            printf("Berapa jarak yang ditempuh per hari (KM/Hari)? ");
+	            scanf("%d", &dist);
+	            emisiDarat = dist * x;
+	            break;
+	
+	        default:
+	            printf("Kendaraan tidak terdaftar.\n");
+	            scanf("%d", &vehicle);
+	        }
+	}while(vehicle != 1 && vehicle != 2);	
+    printf("Emisi Karbon dari Kendaraan Darat: %.3f Ton CO2/tahun\n", emisiDarat);
+	printf("\n");
+    printf("Jenis perjalanan udara:\n1. One-Way Trip\n2. Roundtrip\n");
+    scanf("%d", &vehicle);
+    if(vehicle == 1) trip = 1;
+    else if(vehicle == 2) trip = 2;
+    else {
+    	printf("Pilihan tidak valid. Diasumsikan one-way trip.\n");
+        trip = 1;
+	}		 
+
+    printf("Berapa sering perjalanan dilakukan? ");
+    scanf("%d", &bbm);
+    printf("Berapa jarak yang ditempuh? ");
+    scanf("%d", &dist);
+
+    emisiUdara = trip * dist * 0.000156 * bbm;
+    printf("Emisi Karbon dari Kendaraan Udara: %.3f Ton CO2/tahun\n", emisiUdara);
+    emisi = emisiDarat + emisiUdara;
+    printf("\nTotal Emisi Karbon dari Kedua Tipe Kendaraan: %.3f Ton CO2/Tahun\n", emisi);
+    return emisi;
+}
+
+float hitungListrik(EmisiListrik *dayaListrik, SumberListrik *sumberEnergi, JumlahListrik *listrik, int i) {
+    int x;
+    float dayaBulan; // kWh
+    float dayaBersih; // kWh
+    printf("\n=== Hitung Emisi Listrik ===\n");
+    printf("Berapa jumlah orang yang tinggal di rumah? ");
+    scanf("%d", &dayaListrik[i].orgRumah);
+    if (dayaListrik[i].orgRumah <= 0) {
+        printf("Jumlah orang harus lebih dari 0.\n");
+        return 0;
+    }
+    printf("Tipe Sumber Listrik:\n");
+    printf("1. PLN (100%%)\n");
+    printf("2. Bersih (100%%)\n");
+    printf("3. Hybrid\n");
+    scanf("%d", &x);
+    switch(x) {
+        case 1:
+            sumberEnergi[i] = PLN;
+            break;
+        case 2:
+            sumberEnergi[i] = BERSIH;
+            break; 
+        case 3:
+            sumberEnergi[i] = HYBRID;
+            break;
+        default:
+            printf("Pilihan tidak valid. Silakan coba lagi.\n");
+            return 0;
+    }
+    
+    switch(sumberEnergi[i]) {
+        case PLN:
+            printf("Berapa daya yang terpasang (Watt)? ");
+            printf("\n1. 450 Watt\n2. 900 Watt\n3. 1300 Watt\n4. 2200 Watt\n5. 3500 Watt\n6. 5500 Watt\n7. >6600 Watt\n");
+            scanf("%d", &dayaListrik[i].kategoriDaya);
+            if (dayaListrik[i].kategoriDaya < 1 || dayaListrik[i].kategoriDaya > 7) {
+                printf("Kategori daya tidak valid. Silakan coba lagi.\n");
+                return 0;
+            }
+            printf("Berapa tagihan listrik per bulan (Rp)? ");
+            scanf("%d", &dayaListrik[i].tagihanListrik);
+            if (dayaListrik[i].tagihanListrik <= 0) {
+                printf("Tagihan listrik tidak bisa negatif.\n");
+                return 0;
+            }
+            if (dayaListrik[i].kategoriDaya < 3) {
+                dayaBulan = dayaListrik[i].tagihanListrik / 1352.00;
+            }
+            else if (dayaListrik[i].kategoriDaya >= 3) {
+                dayaBulan = dayaListrik[i].tagihanListrik / 1445.00;
+            }
+            listrik[i].pln = dayaBulan;
+            dayaListrik[i].totalEmisiListrik = listrik[i].pln*0.01*0.984;
+            printf("Emisi Karbon dari Daya Rumah Tangga: %.3f Ton CO2/tahun\n", dayaListrik[i].totalEmisiListrik/dayaListrik[i].orgRumah);
+            return dayaListrik[i].totalEmisiListrik/dayaListrik[i].orgRumah;
+        
+        case BERSIH:
+            printf("Berapa banyak listrik yang dihasilkan sumber energi bersih (dalam kWh)? ");
+            scanf("%f", &dayaBersih);
+            if (dayaBersih < 0) {
+                printf("Daya bersih tidak bisa negatif.\n");
+                return 0;
+            }
+            listrik[i].bersih = dayaBersih;
+            dayaListrik[i].totalEmisiListrik = listrik[i].bersih*0;
+            printf("Emisi Karbon dari Daya Rumah Tangga: %.3f Ton CO2/tahun\n", dayaListrik[i].totalEmisiListrik/dayaListrik[i].orgRumah);
+            return dayaListrik[i].totalEmisiListrik;
+    
+        case HYBRID:
+            printf("Berapa daya yang terpasang (Watt)?");
+            printf("\n1. 450 Watt\n2. 900 Watt\n3. 1300 Watt\n4. 2200 Watt\n5. 3500 Watt\n6. 5500 Watt\n7. >6600 Watt\n");
+            scanf("%d", &dayaListrik[i].kategoriDaya);
+            if (dayaListrik[i].kategoriDaya < 1 || dayaListrik[i].kategoriDaya > 7) {
+                printf("Kategori daya tidak valid. Silakan coba lagi.\n");
+                return 0;
+            }
+            printf("Berapa tagihan listrik per bulan (Rp)? ");
+            scanf("%d", &dayaListrik[i].tagihanListrik);
+            if (dayaListrik[i].tagihanListrik <= 0) {
+                printf("Tagihan listrik tidak bisa negatif.\n");
+                return 0;
+            }
+            if (dayaListrik[i].kategoriDaya < 3) {
+                dayaBulan = dayaListrik[i].tagihanListrik / 1352.00;
+            }
+            else if (dayaListrik[i].kategoriDaya >= 3) {
+                dayaBulan = dayaListrik[i].tagihanListrik / 1445.00;
+            }
+
+            printf("Berapa banyak listrik yang dihasilkan sumber energi bersih (dalam kWh)? ");
+            scanf("%f", &dayaBersih);
+            if (dayaBersih < 0) {
+                printf("Daya bersih tidak bisa negatif.\n");
+                return 0;
+            }
+            listrik[i].hybrid = dayaBulan+dayaBersih*0;
+            dayaListrik[i].totalEmisiListrik = listrik[i].hybrid*0.01*0.984;
+            printf("Emisi Karbon dari Daya Rumah Tangga: %.3f Ton CO2/tahun\n", dayaListrik[i].totalEmisiListrik/dayaListrik[i].orgRumah);
+            return dayaListrik[i].totalEmisiListrik/dayaListrik[i].orgRumah;
+        default:
+            return 0;
+        }
+    }
 
 float hitungPeralatan()
 {
@@ -196,82 +368,41 @@ float hitungPeralatan()
     return total_emisi;
 }
 
-float hitungListrik(EmisiListrik *dayaListrik, SumberListrik *sumberEnergi, JumlahListrik *listrik, int i) {
-    int x;
-    float dayaBulan; // kWh
-    float dayaBersih; // kWh
-    printf("\n=== Hitung Emisi Listrik ===\n");
-    printf("Berapa jumlah orang yang tinggal di rumah? ");
-    scanf("%d", &dayaListrik[i].orgRumah);
-    printf("Tipe Sumber Listrik:\n");
-    printf("1. PLN (100%%)\n");
-    printf("2. Bersih (100%%)\n");
-    printf("3. Hybrid\n");
-    scanf("%d", &x);
-    switch(x) {
-        case 1:
-            sumberEnergi[i] = PLN;
-            break;
-        case 2:
-            sumberEnergi[i] = BERSIH;
-            break; 
-        case 3:
-            sumberEnergi[i] = HYBRID;
-            break;
-        default:
-            printf("Pilihan tidak valid. Silakan coba lagi.\n");
-            return 0;
-    }
-    
-    switch(sumberEnergi[i]) {
-        case PLN:
-            printf("Berapa daya yang terpasang (Watt)? ");
-            printf("\n1. 450 Watt\n2. 900 Watt\n3. 1300 Watt\n4. 2200 Watt\n5. 3500 Watt\n6. 5500 Watt\n7. >6600 Watt\n");
-            scanf("%d", &dayaListrik[i].kategoriDaya);
-            printf("Berapa tagihan listrik per bulan (Rp)? ");
-            scanf("%d", &dayaListrik[i].tagihanListrik);
-            if (dayaListrik[i].kategoriDaya < 3) {
-                dayaBulan = dayaListrik[i].tagihanListrik / 1352.00;
-            }
-            else if (dayaListrik[i].kategoriDaya >= 3) {
-                dayaBulan = dayaListrik[i].tagihanListrik / 1445.00;
-            }
-            listrik[i].pln = dayaBulan;
-            dayaListrik[i].totalEmisiListrik = listrik[i].pln*0.01*0.984;
-            printf("Emisi Karbon dari Daya Rumah Tangga: %.3f Ton CO2/tahun\n", dayaListrik[i].totalEmisiListrik/dayaListrik[i].orgRumah);
-            return dayaListrik[i].totalEmisiListrik/dayaListrik[i].orgRumah;
-        
-        case BERSIH:
-            printf("Berapa banyak listrik yang dihasilkan sumber energi bersih (dalam kWh)? ");
-            scanf("%f", &dayaBersih);
-            listrik[i].bersih = dayaBersih;
-            dayaListrik[i].totalEmisiListrik = listrik[i].bersih*0;
-            printf("Emisi Karbon dari Daya Rumah Tangga: %.3f Ton CO2/tahun\n", dayaListrik[i].totalEmisiListrik/dayaListrik[i].orgRumah);
-            return dayaListrik[i].totalEmisiListrik;
-    
-        case HYBRID:
-            printf("Berapa daya yang terpasang (Watt)?");
-            printf("\n1. 450 Watt\n2. 900 Watt\n3. 1300 Watt\n4. 2200 Watt\n5. 3500 Watt\n6. 5500 Watt\n7. >6600 Watt\n");
-            scanf("%d", &dayaListrik[i].kategoriDaya);
-            printf("Berapa tagihan listrik per bulan (Rp)? ");
-            scanf("%d", &dayaListrik[i].tagihanListrik);
-            if (dayaListrik[i].kategoriDaya < 3) {
-                dayaBulan = dayaListrik[i].tagihanListrik / 1352.00;
-            }
-            else if (dayaListrik[i].kategoriDaya >= 3) {
-                dayaBulan = dayaListrik[i].tagihanListrik / 1445.00;
-            }
+float hitungMakanan(){
+    // Assign nama makanan serta emisi per porsinya
+    Makanan daftarMakanan[11] = {
+        {"Kentang", 0.046},
+        {"Pisang", 0.086},
+        {"Nasi", 0.445},
+        {"Telur", 0.467},
+        {"Keju", 2.388},
+        {"Susu", 0.315},
+        {"Daging Sapi", 3.330},
+        {"Daging Domba", 3.972},
+        {"Daging Babi", 1.231},
+        {"Daging Unggas", 0.987},
+        {"Udang", 2.687}
+    };
 
-            printf("Berapa banyak listrik yang dihasilkan sumber energi bersih (dalam kWh)? ");
-            scanf("%f", &dayaBersih);
-            listrik[i].hybrid = dayaBulan+dayaBersih*0;
-            dayaListrik[i].totalEmisiListrik = listrik[i].hybrid*0.01*0.984;
-            printf("Emisi Karbon dari Daya Rumah Tangga: %.3f Ton CO2/tahun\n", dayaListrik[i].totalEmisiListrik/dayaListrik[i].orgRumah);
-            return dayaListrik[i].totalEmisiListrik/dayaListrik[i].orgRumah;
-        default:
-            return 0;
-        }
+    int frekuensi[11], i;
+    float totalEmisiMakanan = 0;
+
+    printf("\n=== Hitung Emisi Makanan ===\n");
+    printf("Masukkan frekuensi konsumsi tiap makanan per minggu (0-21):\n");
+    
+    for (i = 0; i < 11; i++){
+        printf("%s : ", daftarMakanan[i].namaMakanan);
+        scanf("%d", &frekuensi[i]);
+        
+        float konsumsiTahunan = frekuensi[i] * 52; // 52 minggu per tahun
+        float emisiTahunan = konsumsiTahunan * daftarMakanan[i].emisiPerPorsi;
+        totalEmisiMakanan += emisiTahunan;
     }
+
+    totalEmisiMakanan /= 1000; // Konversi dari kg CO2/tahun menjadi Ton CO2/tahun
+    printf("Emisi Karbon dari Makanan : %.3f Ton CO2/tahun\n", totalEmisiMakanan);
+    return totalEmisiMakanan;
+}
     
     void displayKlasifikasi(KlasifikasiEmisi klas){
         switch(klas){
@@ -326,108 +457,4 @@ void displayLeaderboard(Orang *data, int jumlah) {
         printf("   %2d     | %-20s |%6.2f          |  ", i + 1, data[i].nama, data[i].totalEmisi);
         displayKlasifikasi(data[i].klasTotalEmisi);
     }
-}
-
-float hitungMakanan(){
-    // Assign nama makanan serta emisi per porsinya
-    Makanan daftarMakanan[11] = {
-        {"Kentang", 0.046},
-        {"Pisang", 0.086},
-        {"Nasi", 0.445},
-        {"Telur", 0.467},
-        {"Keju", 2.388},
-        {"Susu", 0.315},
-        {"Daging Sapi", 3.330},
-        {"Daging Domba", 3.972},
-        {"Daging Babi", 1.231},
-        {"Daging Unggas", 0.987},
-        {"Udang", 2.687}
-    };
-
-    int frekuensi[11], i;
-    float totalEmisiMakanan = 0;
-
-    printf("\n=== Hitung Emisi Makanan ===\n");
-    printf("Masukkan frekuensi konsumsi tiap makanan per minggu (0-21):\n");
-    
-    for (i = 0; i < 11; i++){
-        printf("%s : ", daftarMakanan[i].namaMakanan);
-        scanf("%d", &frekuensi[i]);
-        
-        float konsumsiTahunan = frekuensi[i] * 52; // 52 minggu per tahun
-        float emisiTahunan = konsumsiTahunan * daftarMakanan[i].emisiPerPorsi;
-        totalEmisiMakanan += emisiTahunan;
-    }
-
-    totalEmisiMakanan /= 1000; // Konversi dari kg CO2/tahun menjadi Ton CO2/tahun
-    printf("Emisi Karbon dari Makanan : %.3f Ton CO2/tahun\n", totalEmisiMakanan);
-    return totalEmisiMakanan;
-}
-
-float hitungTransportasi() {
-	int choice, vehicle, bbm, dist, trip;
-    float x = 0, emisi = 0, emisiDarat = 0, emisiUdara = 0;
-           
-	printf("Kendaraan apa yang digunakan?\n1. Mobil\n2. Motor\n");
-    scanf("%d", &vehicle);
-    do{
-		switch(vehicle){
-	    	case 1:
-	            printf("Bahan bakar apa yang digunakan?\n1. Bensin\n2. Listrik\n");
-	            scanf("%d", &bbm);
-	            if(bbm == 1) x = 0.08760;
-	            else if(bbm == 2) x = 0.03053;
-	            else {
-	                printf("Bahan tidak terdaftar, mohon coba lagi.\n");
-	                printf("Bahan bakar apa yang digunakan?\n1. Bensin\n2. Listrik\n");
-	            	scanf("%d", &bbm);
-	            }
-	            printf("Berapa jarak yang ditempuh per hari (KM/Hari)? ");
-	            scanf("%d", &dist);
-	            emisiDarat = dist * x;
-	            break;
-			case 2:
-	            printf("Bahan bakar apa yang digunakan?\n1. Bensin\n2. Listrik\n");
-	            scanf("%d", &bbm);
-	            do{
-					
-		            if(bbm == 1) x = 0.03503;
-		            else if(bbm == 2) x = 0.0213;
-		            else {
-		                printf("Bahan tidak terdaftar, mohon coba lagi.\n");
-		                printf("Bahan bakar apa yang digunakan?\n1. Bensin\n2. Listrik\n");
-		            	scanf("%d", &bbm);
-		            }
-		        }while(bbm != 1 && bbm != 2);
-	            printf("Berapa jarak yang ditempuh per hari (KM/Hari)? ");
-	            scanf("%d", &dist);
-	            emisiDarat = dist * x;
-	            break;
-	
-	        default:
-	            printf("Kendaraan tidak terdaftar.\n");
-	            scanf("%d", &vehicle);
-	        }
-	}while(vehicle != 1 && vehicle != 2);	
-    printf("Emisi Karbon dari Kendaraan Darat: %.3f Ton CO2/tahun\n", emisiDarat);
-	printf("\n");
-    printf("Jenis perjalanan udara:\n1. One-Way Trip\n2. Roundtrip\n");
-    scanf("%d", &vehicle);
-    if(vehicle == 1) trip = 1;
-    else if(vehicle == 2) trip = 2;
-    else {
-    	printf("Pilihan tidak valid. Diasumsikan one-way trip.\n");
-        trip = 1;
-	}		 
-
-    printf("Berapa sering perjalanan dilakukan? ");
-    scanf("%d", &bbm);
-    printf("Berapa jarak yang ditempuh? ");
-    scanf("%d", &dist);
-
-    emisiUdara = trip * dist * 0.000156 * bbm;
-    printf("Emisi Karbon dari Kendaraan Udara: %.3f Ton CO2/tahun\n", emisiUdara);
-    emisi = emisiDarat + emisiUdara;
-    printf("\nTotal Emisi Karbon dari Kedua Tipe Kendaraan: %.3f Ton CO2/Tahun\n", emisi);
-    return emisi;
 }
