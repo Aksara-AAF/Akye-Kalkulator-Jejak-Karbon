@@ -195,105 +195,120 @@ float hitungListrik(EmisiListrik *dayaListrik, SumberListrik *sumberEnergi, Juml
     float dayaBulan; // kWh
     float dayaBersih; // kWh
     printf("\n=== Hitung Emisi Listrik ===\n");
-    printf("Berapa jumlah orang yang tinggal di rumah? ");
-    scanf("%d", &dayaListrik[i].orgRumah);
-    if (dayaListrik[i].orgRumah <= 0) {
-        printf("Jumlah orang harus lebih dari 0.\n");
-        return 0;
-    }
+
+    // Input jumlah orang yang tinggal di rumah
+    do {
+        printf("Berapa jumlah orang yang tinggal di rumah? ");
+        scanf("%d", &dayaListrik[i].orgRumah);
+        if (dayaListrik[i].orgRumah <= 0) {
+            printf("Jumlah orang harus lebih dari 0.\n");
+        }
+    } while (dayaListrik[i].orgRumah <= 0);
+
+    // Input tipe sumber listrik
     printf("Tipe Sumber Listrik:\n");
     printf("1. PLN (100%%)\n");
     printf("2. Bersih (100%%)\n");
     printf("3. Hybrid\n");
-    scanf("%d", &x);
-    switch(x) {
-        case 1:
-            sumberEnergi[i] = PLN;
-            break;
-        case 2:
-            sumberEnergi[i] = BERSIH;
-            break; 
-        case 3:
-            sumberEnergi[i] = HYBRID;
-            break;
-        default:
+    do {
+        scanf("%d", &x);
+        if (x < 1 || x > 3) {
             printf("Pilihan tidak valid. Silakan coba lagi.\n");
-            return 0;
+        }
+    } while (x < 1 || x > 3);
+
+    switch(x) {
+        case 1: sumberEnergi[i] = PLN; break;
+        case 2: sumberEnergi[i] = BERSIH; break;
+        case 3: sumberEnergi[i] = HYBRID; break;
     }
-    
+
     switch(sumberEnergi[i]) {
         case PLN:
-            printf("Berapa daya yang terpasang (Watt)? ");
-            printf("\n1. 450 Watt\n2. 900 Watt\n3. 1300 Watt\n4. 2200 Watt\n5. 3500 Watt\n6. 5500 Watt\n7. >6600 Watt\n");
-            scanf("%d", &dayaListrik[i].kategoriDaya);
-            if (dayaListrik[i].kategoriDaya < 1 || dayaListrik[i].kategoriDaya > 7) {
-                printf("Kategori daya tidak valid. Silakan coba lagi.\n");
-                return 0;
-            }
-            printf("Berapa tagihan listrik per bulan (Rp)? ");
-            scanf("%d", &dayaListrik[i].tagihanListrik);
-            if (dayaListrik[i].tagihanListrik <= 0) {
-                printf("Tagihan listrik tidak bisa negatif.\n");
-                return 0;
-            }
+            printf("Berapa daya yang terpasang (Watt)?\n");
+            printf("1. 450 Watt\n2. 900 Watt\n3. 1300 Watt\n4. 2200 Watt\n5. 3500 Watt\n6. 5500 Watt\n7. >6600 Watt\n");
+            do {
+                printf("Pilih kategori daya (1-7): ");
+                scanf("%d", &dayaListrik[i].kategoriDaya);
+                if (dayaListrik[i].kategoriDaya < 1 || dayaListrik[i].kategoriDaya > 7) {
+                    printf("Kategori daya tidak valid. Silakan coba lagi.\n");
+                }
+            } while (dayaListrik[i].kategoriDaya < 1 || dayaListrik[i].kategoriDaya > 7);
+
+            do {
+                printf("Berapa tagihan listrik per bulan (Rp)? ");
+                scanf("%d", &dayaListrik[i].tagihanListrik);
+                if (dayaListrik[i].tagihanListrik <= 0) {
+                    printf("Tagihan listrik tidak bisa negatif. Silakan coba lagi.\n");
+                }
+            } while (dayaListrik[i].tagihanListrik <= 0);
+
             if (dayaListrik[i].kategoriDaya < 3) {
                 dayaBulan = dayaListrik[i].tagihanListrik / 1352.00;
-            }
-            else if (dayaListrik[i].kategoriDaya >= 3) {
+            } else {
                 dayaBulan = dayaListrik[i].tagihanListrik / 1445.00;
             }
             listrik[i].pln = dayaBulan;
-            dayaListrik[i].totalEmisiListrik = listrik[i].pln*0.01*0.984;
-            printf("Emisi Karbon dari Daya Rumah Tangga: %.3f Ton CO2/tahun\n", dayaListrik[i].totalEmisiListrik/dayaListrik[i].orgRumah);
-            return dayaListrik[i].totalEmisiListrik/dayaListrik[i].orgRumah;
-        
+            dayaListrik[i].totalEmisiListrik = listrik[i].pln * 0.01 * 0.984;
+            printf("Emisi Karbon dari Daya Rumah Tangga: %.3f Ton CO2/tahun\n", dayaListrik[i].totalEmisiListrik / dayaListrik[i].orgRumah);
+            return dayaListrik[i].totalEmisiListrik / dayaListrik[i].orgRumah;
+
         case BERSIH:
-            printf("Berapa banyak listrik yang dihasilkan sumber energi bersih (dalam kWh)? ");
-            scanf("%f", &dayaBersih);
-            if (dayaBersih < 0) {
-                printf("Daya bersih tidak bisa negatif.\n");
-                return 0;
-            }
+            do {
+                printf("Berapa banyak listrik yang dihasilkan sumber energi bersih (dalam kWh)? ");
+                scanf("%f", &dayaBersih);
+                if (dayaBersih < 0) {
+                    printf("Daya bersih tidak bisa negatif. Silakan coba lagi.\n");
+                }
+            } while (dayaBersih < 0);
             listrik[i].bersih = dayaBersih;
-            dayaListrik[i].totalEmisiListrik = listrik[i].bersih*0;
-            printf("Emisi Karbon dari Daya Rumah Tangga: %.3f Ton CO2/tahun\n", dayaListrik[i].totalEmisiListrik/dayaListrik[i].orgRumah);
-            return dayaListrik[i].totalEmisiListrik;
-    
+            dayaListrik[i].totalEmisiListrik = listrik[i].bersih * 0;
+            printf("Emisi Karbon dari Daya Rumah Tangga: %.3f Ton CO2/tahun\n", dayaListrik[i].totalEmisiListrik / dayaListrik[i].orgRumah);
+            return dayaListrik[i].totalEmisiListrik / dayaListrik[i].orgRumah;
+
         case HYBRID:
-            printf("Berapa daya yang terpasang (Watt)?");
-            printf("\n1. 450 Watt\n2. 900 Watt\n3. 1300 Watt\n4. 2200 Watt\n5. 3500 Watt\n6. 5500 Watt\n7. >6600 Watt\n");
-            scanf("%d", &dayaListrik[i].kategoriDaya);
-            if (dayaListrik[i].kategoriDaya < 1 || dayaListrik[i].kategoriDaya > 7) {
-                printf("Kategori daya tidak valid. Silakan coba lagi.\n");
-                return 0;
-            }
-            printf("Berapa tagihan listrik per bulan (Rp)? ");
-            scanf("%d", &dayaListrik[i].tagihanListrik);
-            if (dayaListrik[i].tagihanListrik <= 0) {
-                printf("Tagihan listrik tidak bisa negatif.\n");
-                return 0;
-            }
+            printf("Berapa daya yang terpasang (Watt)?\n");
+            printf("1. 450 Watt\n2. 900 Watt\n3. 1300 Watt\n4. 2200 Watt\n5. 3500 Watt\n6. 5500 Watt\n7. >6600 Watt\n");
+            do {
+                printf("Pilih kategori daya (1-7): ");
+                scanf("%d", &dayaListrik[i].kategoriDaya);
+                if (dayaListrik[i].kategoriDaya < 1 || dayaListrik[i].kategoriDaya > 7) {
+                    printf("Kategori daya tidak valid. Silakan coba lagi.\n");
+                }
+            } while (dayaListrik[i].kategoriDaya < 1 || dayaListrik[i].kategoriDaya > 7);
+
+            do {
+                printf("Berapa tagihan listrik per bulan (Rp)? ");
+                scanf("%d", &dayaListrik[i].tagihanListrik);
+                if (dayaListrik[i].tagihanListrik <= 0) {
+                    printf("Tagihan listrik tidak bisa negatif. Silakan coba lagi.\n");
+                }
+            } while (dayaListrik[i].tagihanListrik <= 0);
+
             if (dayaListrik[i].kategoriDaya < 3) {
                 dayaBulan = dayaListrik[i].tagihanListrik / 1352.00;
-            }
-            else if (dayaListrik[i].kategoriDaya >= 3) {
+            } else {
                 dayaBulan = dayaListrik[i].tagihanListrik / 1445.00;
             }
 
-            printf("Berapa banyak listrik yang dihasilkan sumber energi bersih (dalam kWh)? ");
-            scanf("%f", &dayaBersih);
-            if (dayaBersih < 0) {
-                printf("Daya bersih tidak bisa negatif.\n");
-                return 0;
-            }
-            listrik[i].hybrid = dayaBulan+dayaBersih*0;
-            dayaListrik[i].totalEmisiListrik = listrik[i].hybrid*0.01*0.984;
-            printf("Emisi Karbon dari Daya Rumah Tangga: %.3f Ton CO2/tahun\n", dayaListrik[i].totalEmisiListrik/dayaListrik[i].orgRumah);
-            return dayaListrik[i].totalEmisiListrik/dayaListrik[i].orgRumah;
+            do {
+                printf("Berapa banyak listrik yang dihasilkan sumber energi bersih (dalam kWh)? ");
+                scanf("%f", &dayaBersih);
+                if (dayaBersih < 0) {
+                    printf("Daya bersih tidak bisa negatif. Silakan coba lagi.\n");
+                }
+            } while (dayaBersih < 0);
+
+            listrik[i].hybrid = dayaBulan + dayaBersih * 0;
+            dayaListrik[i].totalEmisiListrik = listrik[i].hybrid * 0.01 * 0.984;
+            printf("Emisi Karbon dari Daya Rumah Tangga: %.3f Ton CO2/tahun\n", dayaListrik[i].totalEmisiListrik / dayaListrik[i].orgRumah);
+            return dayaListrik[i].totalEmisiListrik / dayaListrik[i].orgRumah;
+
         default:
+            printf("Terjadi kesalahan input sumber energi.\n");
             return 0;
-        }
     }
+}
 
 float hitungPeralatan()
 {
