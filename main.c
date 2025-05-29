@@ -38,7 +38,7 @@ typedef struct {
 
 
 typedef struct{
-    char namaMakanan[30];
+    char *namaMakanan;
     float emisiPerPorsi; // dalam kg CO2, dan satu porsi = 100 gr 
 } Makanan;
 
@@ -381,39 +381,71 @@ float hitungPeralatan()
     return total_emisi;
 }
 
-float hitungMakanan(){
-    // Assign nama makanan serta emisi per porsinya
-    Makanan daftarMakanan[11] = {
-        {"Kentang", 0.046},
-        {"Pisang", 0.086},
-        {"Nasi", 0.445},
-        {"Telur", 0.467},
-        {"Keju", 2.388},
-        {"Susu", 0.315},
-        {"Daging Sapi", 3.330},
-        {"Daging Domba", 3.972},
-        {"Daging Babi", 1.231},
-        {"Daging Unggas", 0.987},
-        {"Udang", 2.687}
+float hitungMakanan() {
+    int jumlahMakanan = 11;
+
+    // Alokasi dinamis untuk array daftarMakanan dari struct Makanan
+    Makanan* daftarMakanan = (Makanan*) malloc(jumlahMakanan * sizeof(Makanan));
+    if (daftarMakanan == NULL) {
+        printf("Gagal mengalokasikan memori untuk daftar makanan.\n");
+        return 0;
+    }
+
+    // Data makanan dan emisi 
+    const char* namaList[] = {
+        "Kentang", "Pisang", "Nasi", "Telur", "Keju",
+        "Susu", "Daging Sapi", "Daging Domba", "Daging Babi",
+        "Daging Unggas", "Udang"
+    };
+    float emisiList[] = {
+        0.046, 0.086, 0.445, 0.467, 2.388,
+        0.315, 3.330, 3.972, 1.231,
+        0.987, 2.687
     };
 
-    int frekuensi[11], i;
+    // Assign value namaMakanan dan emisiPerPorsi untuk array daftarMakanan
+    for (int i = 0; i < jumlahMakanan; i++) {
+        daftarMakanan[i].namaMakanan = strdup(namaList[i]); // malloc + copy
+        daftarMakanan[i].emisiPerPorsi = emisiList[i];
+    }
+
+    // Alokasi dinamis untuk frekuensi
+    int* frekuensi = (int*) malloc(jumlahMakanan * sizeof(int));
+    if (frekuensi == NULL) {
+        printf("Gagal mengalokasikan memori untuk frekuensi.\n");
+        return 0;
+    }
+
     float totalEmisiMakanan = 0;
 
     printf("\n=== Hitung Emisi Makanan ===\n");
-    printf("Masukkan frekuensi konsumsi tiap makanan per minggu (0-21):\n");
-    
-    for (i = 0; i < 11; i++){
-        printf("%s : ", daftarMakanan[i].namaMakanan);
-        scanf("%d", &frekuensi[i]);
-        
-        float konsumsiTahunan = frekuensi[i] * 52; // 52 minggu per tahun
+    printf("Masukkan frekuensi konsumsi tiap makanan per minggu (0–21 kali/porsi):\n");
+
+    for (int i = 0; i < jumlahMakanan; i++) {
+        do {
+            printf("%s : ", daftarMakanan[i].namaMakanan);
+            scanf("%d", &frekuensi[i]);
+
+            if (frekuensi[i] < 0 || frekuensi[i] > 21) {
+                printf("Jumlah frekuensi tidak valid. Masukkan antara 0–21.\n");
+            }
+        } while (frekuensi[i] < 0 || frekuensi[i] > 21);
+
+        float konsumsiTahunan = frekuensi[i] * 52;
         float emisiTahunan = konsumsiTahunan * daftarMakanan[i].emisiPerPorsi;
         totalEmisiMakanan += emisiTahunan;
     }
 
-    totalEmisiMakanan /= 1000; // Konversi dari kg CO2/tahun menjadi Ton CO2/tahun
+    totalEmisiMakanan /= 1000; // dari kg ke ton
     printf("Emisi Karbon dari Makanan : %.3f Ton CO2/tahun\n", totalEmisiMakanan);
+
+    // Free memori
+    for (int i = 0; i < jumlahMakanan; i++) {
+        free(daftarMakanan[i].namaMakanan); 
+    }
+    free(daftarMakanan);
+    free(frekuensi);
+
     return totalEmisiMakanan;
 }
     
