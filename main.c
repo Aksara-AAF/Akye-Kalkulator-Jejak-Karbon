@@ -64,6 +64,9 @@ void displayKlasifikasi(KlasifikasiEmisi klas);
 void displayTips(float emisiTransportasi, float emisiListrik, float emisiPeralatan, float emisiMakanan);
 void displayLeaderboard(Orang *data, int jumlah);
 
+//Function validasi input
+void clearInputBuffer();
+
 int main()
 {
     int i, n;
@@ -149,70 +152,99 @@ const char *getKlasifikasiLabel(KlasifikasiEmisi klas)
 }
 
 float hitungTransportasi() {
-	int choice, vehicle, bbm, dist, trip;
-    float x = 0, emisi = 0, emisiDarat = 0, emisiUdara = 0;
-           
-	printf("Kendaraan apa yang digunakan?\n1. Mobil\n2. Motor\n");
-    scanf("%d", &vehicle);
-    do{
+	int choice, vehicle, bbm, dist, trip, amount, loop;
+    float x = 0, emisi = 0, emisiM = 0, emisiDarat = 0, emisiUdara = 0;
+	
+	printf("Ada berapa kendaraan darat (Mobil & Motor) yang digunakan? ");
+	scanf("%d", &amount); 
+	for(loop = 0 ; loop < amount ; loop++){
+		printf("\n");
+		printf("Apa kendaraan ke-%d ?\n1. Mobil\n2. Motor\n", loop + 1);
+	    scanf("%d", &vehicle);
 		switch(vehicle){
 	    	case 1:
-	            printf("Bahan bakar apa yang digunakan?\n1. Bensin\n2. Listrik\n");
-	            scanf("%d", &bbm);
-	            if(bbm == 1) x = 0.08760;
-	            else if(bbm == 2) x = 0.03053;
-	            else {
-	                printf("Bahan tidak terdaftar, mohon coba lagi.\n");
-	                printf("Bahan bakar apa yang digunakan?\n1. Bensin\n2. Listrik\n");
-	            	scanf("%d", &bbm);
-	            }
-	            printf("Berapa jarak yang ditempuh per hari (KM/Hari)? ");
-	            scanf("%d", &dist);
-	            emisiDarat = dist * x;
+	    		do{
+		            printf("Bahan bakar apa yang digunakan?\n1. Bensin\n2. Listrik\n");
+		            scanf("%d", &bbm);
+		            if(bbm == 1) x = 0.08760;
+		            else if(bbm == 2) x = 0.03053;
+		            else{
+		            	printf("Bahan bakar tidak tersedia, ulangi.\n");
+					}
+	        	}while(bbm > 2 || bbm < 1);
+	        	do{
+		            printf("Berapa jarak yang ditempuh per hari (KM/Hari)? ");
+		            scanf("%d", &dist);
+		            if(dist <= 0){
+		            	printf("Jarak tidak bisa 0 atau lebih rendah.\n");
+					}
+	            }while(dist <= 0);
+	            emisiM = dist * x;
+	            emisiDarat += emisiM;
 	            break;
 			case 2:
-	            printf("Bahan bakar apa yang digunakan?\n1. Bensin\n2. Listrik\n");
-	            scanf("%d", &bbm);
-	            do{
-					
+				do{
+		            printf("Bahan bakar apa yang digunakan?\n1. Bensin\n2. Listrik\n");
+		            scanf("%d", &bbm);
 		            if(bbm == 1) x = 0.03503;
 		            else if(bbm == 2) x = 0.0213;
 		            else {
 		                printf("Bahan tidak terdaftar, mohon coba lagi.\n");
-		                printf("Bahan bakar apa yang digunakan?\n1. Bensin\n2. Listrik\n");
-		            	scanf("%d", &bbm);
 		            }
-		        }while(bbm != 1 && bbm != 2);
-	            printf("Berapa jarak yang ditempuh per hari (KM/Hari)? ");
-	            scanf("%d", &dist);
-	            emisiDarat = dist * x;
+	        	}while(bbm > 2 || bbm < 1);
+	        	do{
+		            printf("Berapa jarak yang ditempuh per hari (KM/Hari)? ");
+		            scanf("%d", &dist);
+		            if(dist <= 0){
+		            	printf("Jarak tidak bisa 0 atau lebih rendah.\n");
+					}
+	            }while(dist <= 0);
+	            emisiM = dist * x;
+	            emisiDarat += emisiM;
 	            break;
 	
 	        default:
 	            printf("Kendaraan tidak terdaftar.\n");
-	            scanf("%d", &vehicle);
-	        }
-	}while(vehicle != 1 && vehicle != 2);	
+	            loop--;
+	            }
+    }
     printf("Emisi Karbon dari Kendaraan Darat: %.3f Ton CO2/tahun\n", emisiDarat);
+    
 	printf("\n");
-    printf("Jenis perjalanan udara:\n1. One-Way Trip\n2. Roundtrip\n");
-    scanf("%d", &vehicle);
-    if(vehicle == 1) trip = 1;
-    else if(vehicle == 2) trip = 2;
-    else {
-    	printf("Pilihan tidak valid. Diasumsikan one-way trip.\n");
-        trip = 1;
-	}		 
-
-    printf("Berapa sering perjalanan dilakukan? ");
-    scanf("%d", &bbm);
-    printf("Berapa jarak yang ditempuh? ");
-    scanf("%d", &dist);
-
+	do{
+		printf("Apakah menggunakan kendaraan udara (Pesawat)?\n1. Iya\n2. Tidak\n");
+		scanf("%d", &amount);
+		switch(amount){
+			case 1:
+				printf("Jenis perjalanan udara:\n1. One-Way Trip\n2. Roundtrip\n");
+			    scanf("%d", &vehicle);
+			    if(vehicle == 1) trip = 1;
+			    else if(vehicle == 2) trip = 2;
+			    else {
+			    	printf("Pilihan tidak valid. Diasumsikan one-way trip.\n");
+			        trip = 1;
+				}		 
+			
+			    printf("Berapa sering perjalanan dilakukan? ");
+			    scanf("%d", &bbm);
+			    printf("Berapa jarak yang ditempuh (KM/perjalanan)? ");
+			    scanf("%d", &dist);
+				break;
+				
+			case 2:
+				trip = 0;
+				bbm = 0;
+				dist = 0;
+				break;
+			
+			default:
+				printf("Opsi tidak valid.\n");
+		}
+	}while(amount > 2 || amount < 1);
     emisiUdara = trip * dist * 0.000156 * bbm;
     printf("Emisi Karbon dari Kendaraan Udara: %.3f Ton CO2/tahun\n", emisiUdara);
     emisi = emisiDarat + emisiUdara;
-    printf("\nTotal Emisi Karbon dari Kedua Tipe Kendaraan: %.3f Ton CO2/Tahun\n", emisi);
+    printf("\nTotal Emisi Karbon dari Kedua Tipe Kendaraan: %.3f Ton CO2/Tahun", emisi);
     return emisi;
 }
 
