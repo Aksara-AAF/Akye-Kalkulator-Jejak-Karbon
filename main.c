@@ -1,6 +1,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <time.h>
+#include <string.h>
 
 typedef enum {
     RENDAH, NORMAL, TINGGI
@@ -54,7 +55,7 @@ float hitungMakanan();
 
 //Function Display
 void displayKlasifikasi(KlasifikasiEmisi klas);
-void displayTips();
+void displayTips(float emisiTransportasi, float emisiListrik, float emisiPeralatan, float emisiMakanan);
 void displayLeaderboard(Orang *data, int jumlah);
 
 int main() {
@@ -87,12 +88,9 @@ int main() {
         (ptrOrang + i)->totalEmisi = total;
         (ptrOrang + i)->klasTotalEmisi = klasifikasiEmisi(total);
         
-        printf("\nTotal Emisi %s: %.2f Ton CO2/tahun\n", ptrOrang[i].nama, total);
-        if ((ptrOrang + i)->klasTotalEmisi == RENDAH){
-        	printf("Bagus Pertahankan!\n");
-		}else{
-			displayTips();
-		}
+        printf("\nTotal Emisi Karbon: %.2f kg CO2\n", total);
+
+        displayTips(emisiTransportasi, emisiListrik, emisiPeralatan, emisiMakanan);
 
     }
 
@@ -404,40 +402,87 @@ float hitungMakanan(){
     return totalEmisiMakanan;
 }
     
-    void displayKlasifikasi(KlasifikasiEmisi klas){
-        switch(klas){
-            case RENDAH:
-                printf("Rendah \n");
-                break;
-            case NORMAL:
-                printf("Normal \n");
-                break;
-            case TINGGI:
-                printf("Tinggi \n");
-                break;
-            default:
-                printf("Tidak diketahui\n");
-        }
+void displayKlasifikasi(KlasifikasiEmisi klas){
+    switch(klas){
+        case RENDAH:
+            printf("Rendah \n");
+            break;
+        case NORMAL:
+            printf("Normal \n");
+            break;
+        case TINGGI:
+            printf("Tinggi \n");
+            break;
+        default:
+            printf("Tidak diketahui\n");
     }
+}
     
-    void displayTips(){
-        const char *tips[] = {
-        "Kurangi penggunaan kendaraan bermotor pribadi.",
-        "Gunakan transportasi umum atau sepeda.",
-        "Matikan lampu dan peralatan listrik saat tidak digunakan.",
-        "Gunakan peralatan hemat energi.",
-        "Kurangi konsumsi daging merah.",
-        "Belilah produk lokal dan musiman.",
-        "Gunakan air dengan bijak, hindari pemborosan.",
-        "Daur ulang sampah yang bisa digunakan kembali.",
-        "Gunakan tas belanja yang dapat digunakan ulang.",
-        "Tanam pohon atau tanaman di sekitar rumah."
+void displayTips(float emisiTransportasi, float emisiListrik, float emisiPeralatan, float emisiMakanan) {
+    char *tipsTransportasi[] = {
+        "Gunakan transportasi umum lebih sering.",
+        "Cobalah bersepeda untuk perjalanan pendek.",
+        "Kurangi penggunaan mobil pribadi.",
+        "Berjalan kaki jika jaraknya dekat."
     };
 
-    int jumlahTips = sizeof(tips) / sizeof(tips[0]);
-    int index = rand() % jumlahTips;
-    printf("Tips: %s\n", tips[index]);
+    char *tipsListrik[] = {
+        "Gunakan lampu LED hemat energi.",
+        "Matikan perangkat listrik saat tidak digunakan.",
+        "Cabut charger setelah dipakai.",
+        "Gunakan AC seperlunya, jangan berlebihan."
+    };
+
+    char *tipsPeralatan[] = {
+        "Gunakan peralatan elektronik berlabel hemat energi.",
+        "Kurangi penggunaan microwave dan oven listrik.",
+        "Jangan gunakan mesin cuci terlalu sering.",
+        "Matikan TV atau komputer jika tidak dipakai."
+    };
+  
+    char *tipsMakanan[] = {
+        "Kurangi konsumsi daging merah.",
+        "Pilih makanan lokal dan musiman.",
+        "Kurangi makanan olahan dan kemasan.",
+        "Masak secukupnya agar tidak ada sisa makanan."
+    };
+
+    int idx;
+    float tertinggi = emisiTransportasi;
+    char kategori[20] = "Transportasi";
+
+    if (emisiListrik > tertinggi) {
+        tertinggi = emisiListrik;
+        strcpy(kategori, "Listrik");
+    }
+    if (emisiPeralatan > tertinggi) {
+        tertinggi = emisiPeralatan;
+        strcpy(kategori, "Peralatan");
+    }
+    if (emisiMakanan > tertinggi) {
+        tertinggi = emisiMakanan;
+        strcpy(kategori, "Makanan");
+    }
+
+    printf("\n--- Tips Pengurangan Jejak Karbon ---\n");
+    printf("Kategori Tertinggi: %s\n", kategori);
+
+    if (strcmp(kategori, "Transportasi") == 0) {
+        idx = rand() % 4;
+        printf("Tips: %s\n", tipsTransportasi[idx]);
+    } else if (strcmp(kategori, "Listrik") == 0) {
+        idx = rand() % 4;
+        printf("Tips: %s\n", tipsListrik[idx]);
+    } else if (strcmp(kategori, "Peralatan") == 0) {
+        idx = rand() % 4;
+        printf("Tips: %s\n", tipsPeralatan[idx]);
+    } else if (strcmp(kategori, "Makanan") == 0) {
+        idx = rand() % 4;
+        printf("Tips: %s\n", tipsMakanan[idx]);
+    }
 }
+
+
 
 void displayLeaderboard(Orang *data, int jumlah) {
     int i,j;
