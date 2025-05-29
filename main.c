@@ -402,21 +402,21 @@ float hitungMakanan(){
     return totalEmisiMakanan;
 }
     
-	    void displayKlasifikasi(KlasifikasiEmisi klas){
-	        switch(klas){
-	            case RENDAH:
-	                printf("Rendah \n");
-	                break;
-	            case NORMAL:
-	                printf("Normal \n");
-	                break;
-	            case TINGGI:
-	                printf("Tinggi \n");
-	                break;
-	            default:
-	                printf("Tidak diketahui\n");
-	        }
-	    }
+void displayKlasifikasi(KlasifikasiEmisi klas){
+    switch(klas){
+        case RENDAH:
+            printf("Rendah \n");
+            break;
+        case NORMAL:
+            printf("Normal \n");
+            break;
+        case TINGGI:
+            printf("Tinggi \n");
+            break;
+        default:
+            printf("Tidak diketahui\n");
+    }
+}
     
 void displayTips(float emisiTransportasi, float emisiListrik, float emisiPeralatan, float emisiMakanan) {
     char *tipsTransportasi[] = {
@@ -439,7 +439,7 @@ void displayTips(float emisiTransportasi, float emisiListrik, float emisiPeralat
         "Jangan gunakan mesin cuci terlalu sering.",
         "Matikan TV atau komputer jika tidak dipakai."
     };
-
+  
     char *tipsMakanan[] = {
         "Kurangi konsumsi daging merah.",
         "Pilih makanan lokal dan musiman.",
