@@ -1,6 +1,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <time.h>
+#include <string.h>
 
 typedef enum {
     RENDAH, NORMAL, TINGGI
@@ -54,7 +55,7 @@ float hitungMakanan();
 
 //Function Display
 void displayKlasifikasi(KlasifikasiEmisi klas);
-void displayTips();
+void displayTips(float emisiTransportasi, float emisiListrik, float emisiPeralatan, float emisiMakanan);
 void displayLeaderboard(Orang *data, int jumlah);
 
 int main() {
@@ -87,12 +88,9 @@ int main() {
         (ptrOrang + i)->totalEmisi = total;
         (ptrOrang + i)->klasTotalEmisi = klasifikasiEmisi(total);
         
-        printf("\nTotal Emisi %s: %.2f Ton CO2/tahun\n", ptrOrang[i].nama, total);
-        if ((ptrOrang + i)->klasTotalEmisi == RENDAH){
-        	printf("Bagus Pertahankan!\n");
-		}else{
-			displayTips();
-		}
+        printf("\nTotal Emisi Karbon: %.2f kg CO2\n", total);
+
+        displayTips(emisiTransportasi, emisiListrik, emisiPeralatan, emisiMakanan);
 
     }
 
@@ -197,105 +195,120 @@ float hitungListrik(EmisiListrik *dayaListrik, SumberListrik *sumberEnergi, Juml
     float dayaBulan; // kWh
     float dayaBersih; // kWh
     printf("\n=== Hitung Emisi Listrik ===\n");
-    printf("Berapa jumlah orang yang tinggal di rumah? ");
-    scanf("%d", &dayaListrik[i].orgRumah);
-    if (dayaListrik[i].orgRumah <= 0) {
-        printf("Jumlah orang harus lebih dari 0.\n");
-        return 0;
-    }
+
+    // Input jumlah orang yang tinggal di rumah
+    do {
+        printf("Berapa jumlah orang yang tinggal di rumah? ");
+        scanf("%d", &dayaListrik[i].orgRumah);
+        if (dayaListrik[i].orgRumah <= 0) {
+            printf("Jumlah orang harus lebih dari 0.\n");
+        }
+    } while (dayaListrik[i].orgRumah <= 0);
+
+    // Input tipe sumber listrik
     printf("Tipe Sumber Listrik:\n");
     printf("1. PLN (100%%)\n");
     printf("2. Bersih (100%%)\n");
     printf("3. Hybrid\n");
-    scanf("%d", &x);
-    switch(x) {
-        case 1:
-            sumberEnergi[i] = PLN;
-            break;
-        case 2:
-            sumberEnergi[i] = BERSIH;
-            break; 
-        case 3:
-            sumberEnergi[i] = HYBRID;
-            break;
-        default:
+    do {
+        scanf("%d", &x);
+        if (x < 1 || x > 3) {
             printf("Pilihan tidak valid. Silakan coba lagi.\n");
-            return 0;
+        }
+    } while (x < 1 || x > 3);
+
+    switch(x) {
+        case 1: sumberEnergi[i] = PLN; break;
+        case 2: sumberEnergi[i] = BERSIH; break;
+        case 3: sumberEnergi[i] = HYBRID; break;
     }
-    
+
     switch(sumberEnergi[i]) {
         case PLN:
-            printf("Berapa daya yang terpasang (Watt)? ");
-            printf("\n1. 450 Watt\n2. 900 Watt\n3. 1300 Watt\n4. 2200 Watt\n5. 3500 Watt\n6. 5500 Watt\n7. >6600 Watt\n");
-            scanf("%d", &dayaListrik[i].kategoriDaya);
-            if (dayaListrik[i].kategoriDaya < 1 || dayaListrik[i].kategoriDaya > 7) {
-                printf("Kategori daya tidak valid. Silakan coba lagi.\n");
-                return 0;
-            }
-            printf("Berapa tagihan listrik per bulan (Rp)? ");
-            scanf("%d", &dayaListrik[i].tagihanListrik);
-            if (dayaListrik[i].tagihanListrik <= 0) {
-                printf("Tagihan listrik tidak bisa negatif.\n");
-                return 0;
-            }
+            printf("Berapa daya yang terpasang (Watt)?\n");
+            printf("1. 450 Watt\n2. 900 Watt\n3. 1300 Watt\n4. 2200 Watt\n5. 3500 Watt\n6. 5500 Watt\n7. >6600 Watt\n");
+            do {
+                printf("Pilih kategori daya (1-7): ");
+                scanf("%d", &dayaListrik[i].kategoriDaya);
+                if (dayaListrik[i].kategoriDaya < 1 || dayaListrik[i].kategoriDaya > 7) {
+                    printf("Kategori daya tidak valid. Silakan coba lagi.\n");
+                }
+            } while (dayaListrik[i].kategoriDaya < 1 || dayaListrik[i].kategoriDaya > 7);
+
+            do {
+                printf("Berapa tagihan listrik per bulan (Rp)? ");
+                scanf("%d", &dayaListrik[i].tagihanListrik);
+                if (dayaListrik[i].tagihanListrik <= 0) {
+                    printf("Tagihan listrik tidak bisa negatif. Silakan coba lagi.\n");
+                }
+            } while (dayaListrik[i].tagihanListrik <= 0);
+
             if (dayaListrik[i].kategoriDaya < 3) {
                 dayaBulan = dayaListrik[i].tagihanListrik / 1352.00;
-            }
-            else if (dayaListrik[i].kategoriDaya >= 3) {
+            } else {
                 dayaBulan = dayaListrik[i].tagihanListrik / 1445.00;
             }
             listrik[i].pln = dayaBulan;
-            dayaListrik[i].totalEmisiListrik = listrik[i].pln*0.01*0.984;
-            printf("Emisi Karbon dari Daya Rumah Tangga: %.3f Ton CO2/tahun\n", dayaListrik[i].totalEmisiListrik/dayaListrik[i].orgRumah);
-            return dayaListrik[i].totalEmisiListrik/dayaListrik[i].orgRumah;
-        
+            dayaListrik[i].totalEmisiListrik = listrik[i].pln * 0.01 * 0.984;
+            printf("Emisi Karbon dari Daya Rumah Tangga: %.3f Ton CO2/tahun\n", dayaListrik[i].totalEmisiListrik / dayaListrik[i].orgRumah);
+            return dayaListrik[i].totalEmisiListrik / dayaListrik[i].orgRumah;
+
         case BERSIH:
-            printf("Berapa banyak listrik yang dihasilkan sumber energi bersih (dalam kWh)? ");
-            scanf("%f", &dayaBersih);
-            if (dayaBersih < 0) {
-                printf("Daya bersih tidak bisa negatif.\n");
-                return 0;
-            }
+            do {
+                printf("Berapa banyak listrik yang dihasilkan sumber energi bersih (dalam kWh)? ");
+                scanf("%f", &dayaBersih);
+                if (dayaBersih < 0) {
+                    printf("Daya bersih tidak bisa negatif. Silakan coba lagi.\n");
+                }
+            } while (dayaBersih < 0);
             listrik[i].bersih = dayaBersih;
-            dayaListrik[i].totalEmisiListrik = listrik[i].bersih*0;
-            printf("Emisi Karbon dari Daya Rumah Tangga: %.3f Ton CO2/tahun\n", dayaListrik[i].totalEmisiListrik/dayaListrik[i].orgRumah);
-            return dayaListrik[i].totalEmisiListrik;
-    
+            dayaListrik[i].totalEmisiListrik = listrik[i].bersih * 0;
+            printf("Emisi Karbon dari Daya Rumah Tangga: %.3f Ton CO2/tahun\n", dayaListrik[i].totalEmisiListrik / dayaListrik[i].orgRumah);
+            return dayaListrik[i].totalEmisiListrik / dayaListrik[i].orgRumah;
+
         case HYBRID:
-            printf("Berapa daya yang terpasang (Watt)?");
-            printf("\n1. 450 Watt\n2. 900 Watt\n3. 1300 Watt\n4. 2200 Watt\n5. 3500 Watt\n6. 5500 Watt\n7. >6600 Watt\n");
-            scanf("%d", &dayaListrik[i].kategoriDaya);
-            if (dayaListrik[i].kategoriDaya < 1 || dayaListrik[i].kategoriDaya > 7) {
-                printf("Kategori daya tidak valid. Silakan coba lagi.\n");
-                return 0;
-            }
-            printf("Berapa tagihan listrik per bulan (Rp)? ");
-            scanf("%d", &dayaListrik[i].tagihanListrik);
-            if (dayaListrik[i].tagihanListrik <= 0) {
-                printf("Tagihan listrik tidak bisa negatif.\n");
-                return 0;
-            }
+            printf("Berapa daya yang terpasang (Watt)?\n");
+            printf("1. 450 Watt\n2. 900 Watt\n3. 1300 Watt\n4. 2200 Watt\n5. 3500 Watt\n6. 5500 Watt\n7. >6600 Watt\n");
+            do {
+                printf("Pilih kategori daya (1-7): ");
+                scanf("%d", &dayaListrik[i].kategoriDaya);
+                if (dayaListrik[i].kategoriDaya < 1 || dayaListrik[i].kategoriDaya > 7) {
+                    printf("Kategori daya tidak valid. Silakan coba lagi.\n");
+                }
+            } while (dayaListrik[i].kategoriDaya < 1 || dayaListrik[i].kategoriDaya > 7);
+
+            do {
+                printf("Berapa tagihan listrik per bulan (Rp)? ");
+                scanf("%d", &dayaListrik[i].tagihanListrik);
+                if (dayaListrik[i].tagihanListrik <= 0) {
+                    printf("Tagihan listrik tidak bisa negatif. Silakan coba lagi.\n");
+                }
+            } while (dayaListrik[i].tagihanListrik <= 0);
+
             if (dayaListrik[i].kategoriDaya < 3) {
                 dayaBulan = dayaListrik[i].tagihanListrik / 1352.00;
-            }
-            else if (dayaListrik[i].kategoriDaya >= 3) {
+            } else {
                 dayaBulan = dayaListrik[i].tagihanListrik / 1445.00;
             }
 
-            printf("Berapa banyak listrik yang dihasilkan sumber energi bersih (dalam kWh)? ");
-            scanf("%f", &dayaBersih);
-            if (dayaBersih < 0) {
-                printf("Daya bersih tidak bisa negatif.\n");
-                return 0;
-            }
-            listrik[i].hybrid = dayaBulan+dayaBersih*0;
-            dayaListrik[i].totalEmisiListrik = listrik[i].hybrid*0.01*0.984;
-            printf("Emisi Karbon dari Daya Rumah Tangga: %.3f Ton CO2/tahun\n", dayaListrik[i].totalEmisiListrik/dayaListrik[i].orgRumah);
-            return dayaListrik[i].totalEmisiListrik/dayaListrik[i].orgRumah;
+            do {
+                printf("Berapa banyak listrik yang dihasilkan sumber energi bersih (dalam kWh)? ");
+                scanf("%f", &dayaBersih);
+                if (dayaBersih < 0) {
+                    printf("Daya bersih tidak bisa negatif. Silakan coba lagi.\n");
+                }
+            } while (dayaBersih < 0);
+
+            listrik[i].hybrid = dayaBulan + dayaBersih * 0;
+            dayaListrik[i].totalEmisiListrik = listrik[i].hybrid * 0.01 * 0.984;
+            printf("Emisi Karbon dari Daya Rumah Tangga: %.3f Ton CO2/tahun\n", dayaListrik[i].totalEmisiListrik / dayaListrik[i].orgRumah);
+            return dayaListrik[i].totalEmisiListrik / dayaListrik[i].orgRumah;
+
         default:
+            printf("Terjadi kesalahan input sumber energi.\n");
             return 0;
-        }
     }
+}
 
 float hitungPeralatan()
 {
@@ -436,40 +449,87 @@ float hitungMakanan() {
     return totalEmisiMakanan;
 }
     
-    void displayKlasifikasi(KlasifikasiEmisi klas){
-        switch(klas){
-            case RENDAH:
-                printf("Rendah \n");
-                break;
-            case NORMAL:
-                printf("Normal \n");
-                break;
-            case TINGGI:
-                printf("Tinggi \n");
-                break;
-            default:
-                printf("Tidak diketahui\n");
-        }
+void displayKlasifikasi(KlasifikasiEmisi klas){
+    switch(klas){
+        case RENDAH:
+            printf("Rendah \n");
+            break;
+        case NORMAL:
+            printf("Normal \n");
+            break;
+        case TINGGI:
+            printf("Tinggi \n");
+            break;
+        default:
+            printf("Tidak diketahui\n");
     }
+}
     
-    void displayTips(){
-        const char *tips[] = {
-        "Kurangi penggunaan kendaraan bermotor pribadi.",
-        "Gunakan transportasi umum atau sepeda.",
-        "Matikan lampu dan peralatan listrik saat tidak digunakan.",
-        "Gunakan peralatan hemat energi.",
-        "Kurangi konsumsi daging merah.",
-        "Belilah produk lokal dan musiman.",
-        "Gunakan air dengan bijak, hindari pemborosan.",
-        "Daur ulang sampah yang bisa digunakan kembali.",
-        "Gunakan tas belanja yang dapat digunakan ulang.",
-        "Tanam pohon atau tanaman di sekitar rumah."
+void displayTips(float emisiTransportasi, float emisiListrik, float emisiPeralatan, float emisiMakanan) {
+    char *tipsTransportasi[] = {
+        "Gunakan transportasi umum lebih sering.",
+        "Cobalah bersepeda untuk perjalanan pendek.",
+        "Kurangi penggunaan mobil pribadi.",
+        "Berjalan kaki jika jaraknya dekat."
     };
 
-    int jumlahTips = sizeof(tips) / sizeof(tips[0]);
-    int index = rand() % jumlahTips;
-    printf("Tips: %s\n", tips[index]);
+    char *tipsListrik[] = {
+        "Gunakan lampu LED hemat energi.",
+        "Matikan perangkat listrik saat tidak digunakan.",
+        "Cabut charger setelah dipakai.",
+        "Gunakan AC seperlunya, jangan berlebihan."
+    };
+
+    char *tipsPeralatan[] = {
+        "Gunakan peralatan elektronik berlabel hemat energi.",
+        "Kurangi penggunaan microwave dan oven listrik.",
+        "Jangan gunakan mesin cuci terlalu sering.",
+        "Matikan TV atau komputer jika tidak dipakai."
+    };
+  
+    char *tipsMakanan[] = {
+        "Kurangi konsumsi daging merah.",
+        "Pilih makanan lokal dan musiman.",
+        "Kurangi makanan olahan dan kemasan.",
+        "Masak secukupnya agar tidak ada sisa makanan."
+    };
+
+    int idx;
+    float tertinggi = emisiTransportasi;
+    char kategori[20] = "Transportasi";
+
+    if (emisiListrik > tertinggi) {
+        tertinggi = emisiListrik;
+        strcpy(kategori, "Listrik");
+    }
+    if (emisiPeralatan > tertinggi) {
+        tertinggi = emisiPeralatan;
+        strcpy(kategori, "Peralatan");
+    }
+    if (emisiMakanan > tertinggi) {
+        tertinggi = emisiMakanan;
+        strcpy(kategori, "Makanan");
+    }
+
+    printf("\n--- Tips Pengurangan Jejak Karbon ---\n");
+    printf("Kategori Tertinggi: %s\n", kategori);
+
+    if (strcmp(kategori, "Transportasi") == 0) {
+        idx = rand() % 4;
+        printf("Tips: %s\n", tipsTransportasi[idx]);
+    } else if (strcmp(kategori, "Listrik") == 0) {
+        idx = rand() % 4;
+        printf("Tips: %s\n", tipsListrik[idx]);
+    } else if (strcmp(kategori, "Peralatan") == 0) {
+        idx = rand() % 4;
+        printf("Tips: %s\n", tipsPeralatan[idx]);
+    } else if (strcmp(kategori, "Makanan") == 0) {
+        idx = rand() % 4;
+        printf("Tips: %s\n", tipsMakanan[idx]);
+    }
 }
+
+
 
 void displayLeaderboard(Orang *data, int jumlah) {
     int i,j;
