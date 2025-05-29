@@ -20,9 +20,9 @@ typedef enum {
 } SumberListrik;
 
 typedef union {
-    int pln;
-    int bersih;
-    int hybrid; 
+    float pln;
+    float bersih;
+    float hybrid; 
 } JumlahListrik;
 
 typedef struct {
@@ -191,7 +191,6 @@ float hitungTransportasi() {
 }
 
 float hitungListrik(EmisiListrik *dayaListrik, SumberListrik *sumberEnergi, JumlahListrik *listrik, int i) {
-    int x;
     float dayaBulan; // kWh
     float dayaBersih; // kWh
     printf("\n=== Hitung Emisi Listrik ===\n");
@@ -211,13 +210,14 @@ float hitungListrik(EmisiListrik *dayaListrik, SumberListrik *sumberEnergi, Juml
     printf("2. Bersih (100%%)\n");
     printf("3. Hybrid\n");
     do {
-        scanf("%d", &x);
-        if (x < 1 || x > 3) {
+        scanf("%d", &dayaListrik[i].tipeSumberListrik);
+        if (dayaListrik[i].tipeSumberListrik < 1 || dayaListrik[i].tipeSumberListrik > 3) {
             printf("Pilihan tidak valid. Silakan coba lagi.\n");
         }
-    } while (x < 1 || x > 3);
 
-    switch(x) {
+    } while (dayaListrik[i].tipeSumberListrik < 1 || dayaListrik[i].tipeSumberListrik > 3);
+
+    switch(dayaListrik[i].tipeSumberListrik) {
         case 1: sumberEnergi[i] = PLN; break;
         case 2: sumberEnergi[i] = BERSIH; break;
         case 3: sumberEnergi[i] = HYBRID; break;
@@ -249,6 +249,7 @@ float hitungListrik(EmisiListrik *dayaListrik, SumberListrik *sumberEnergi, Juml
                 dayaBulan = dayaListrik[i].tagihanListrik / 1445.00;
             }
             listrik[i].pln = dayaBulan;
+            dayaListrik[i].listrikPLN = listrik[i].pln;
             dayaListrik[i].totalEmisiListrik = listrik[i].pln * 0.01 * 0.984;
             printf("Emisi Karbon dari Daya Rumah Tangga: %.3f Ton CO2/tahun\n", dayaListrik[i].totalEmisiListrik / dayaListrik[i].orgRumah);
             return dayaListrik[i].totalEmisiListrik / dayaListrik[i].orgRumah;
@@ -262,6 +263,7 @@ float hitungListrik(EmisiListrik *dayaListrik, SumberListrik *sumberEnergi, Juml
                 }
             } while (dayaBersih < 0);
             listrik[i].bersih = dayaBersih;
+            dayaListrik[i].listrikBersih = listrik[i].bersih;
             dayaListrik[i].totalEmisiListrik = listrik[i].bersih * 0;
             printf("Emisi Karbon dari Daya Rumah Tangga: %.3f Ton CO2/tahun\n", dayaListrik[i].totalEmisiListrik / dayaListrik[i].orgRumah);
             return dayaListrik[i].totalEmisiListrik / dayaListrik[i].orgRumah;
@@ -300,6 +302,7 @@ float hitungListrik(EmisiListrik *dayaListrik, SumberListrik *sumberEnergi, Juml
             } while (dayaBersih < 0);
 
             listrik[i].hybrid = dayaBulan + dayaBersih * 0;
+            dayaListrik[i].listrikHybrid = listrik[i].hybrid;
             dayaListrik[i].totalEmisiListrik = listrik[i].hybrid * 0.01 * 0.984;
             printf("Emisi Karbon dari Daya Rumah Tangga: %.3f Ton CO2/tahun\n", dayaListrik[i].totalEmisiListrik / dayaListrik[i].orgRumah);
             return dayaListrik[i].totalEmisiListrik / dayaListrik[i].orgRumah;
