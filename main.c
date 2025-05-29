@@ -419,7 +419,7 @@ float hitungMakanan() {
     float totalEmisiMakanan = 0;
 
     printf("\n=== Hitung Emisi Makanan ===\n");
-    printf("Masukkan frekuensi konsumsi tiap makanan per minggu (0–21 kali/porsi):\n");
+    printf("Masukkan frekuensi konsumsi tiap makanan per minggu (0-21 kali/porsi):\n");
 
     for (int i = 0; i < jumlahMakanan; i++) {
         do {
@@ -427,7 +427,7 @@ float hitungMakanan() {
             scanf("%d", &frekuensi[i]);
 
             if (frekuensi[i] < 0 || frekuensi[i] > 21) {
-                printf("Jumlah frekuensi tidak valid. Masukkan antara 0–21.\n");
+                printf("Jumlah frekuensi tidak valid. Masukkan antara 0-21.\n");
             }
         } while (frekuensi[i] < 0 || frekuensi[i] > 21);
 
