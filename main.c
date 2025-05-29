@@ -3,17 +3,22 @@
 #include <time.h>
 #include <string.h>
 
-typedef enum {
-    RENDAH, NORMAL, TINGGI
+typedef enum
+{
+    RENDAH,
+    NORMAL,
+    TINGGI
 } KlasifikasiEmisi;
 
-typedef struct{
+typedef struct
+{
     char nama[50];
     float totalEmisi;
     KlasifikasiEmisi klasTotalEmisi;
 } Orang;
 
-typedef enum {
+typedef enum
+{
     PLN,
     BERSIH,
     HYBRID
@@ -25,14 +30,15 @@ typedef union {
     float hybrid; 
 } JumlahListrik;
 
-typedef struct {
-    int orgRumah; // banyak orang dalam rumah
-    int tipeSumberListrik; // kode untuk sumber listrik (1 = PLN, 2 = BERSIH, 3 = HYBRID)
-    int kategoriDaya; // kategori daya listrik PLN (1-7)
-    int tagihanListrik; // tagihan listrik per bulan
-    float listrikPLN; // kWh listrik PLN
-    float listrikBersih; // kWh listrik bersih
-    float listrikHybrid; // kWh listrik hybrid (PLN + bersih)
+typedef struct
+{
+    int orgRumah;            // banyak orang dalam rumah
+    int tipeSumberListrik;   // kode untuk sumber listrik (1 = PLN, 2 = BERSIH, 3 = HYBRID)
+    int kategoriDaya;        // kategori daya listrik PLN (1-7)
+    int tagihanListrik;      // tagihan listrik per bulan
+    float listrikPLN;        // kWh listrik PLN
+    float listrikBersih;     // kWh listrik bersih
+    float listrikHybrid;     // kWh listrik hybrid (PLN + bersih)
     float totalEmisiListrik; // total emisi dari daya listrik
 } EmisiListrik;
 
@@ -42,30 +48,31 @@ typedef struct{
     float emisiPerPorsi; // dalam kg CO2, dan satu porsi = 100 gr 
 } Makanan;
 
-// Deklarasi fungsi, silahkan tambahkan parameternya bila perlu  
-//Function Klasifikasi
+// Deklarasi fungsi, silahkan tambahkan parameternya bila perlu
+// Function Klasifikasi
 KlasifikasiEmisi klasifikasiEmisi(float emisi);
-const char* getKlasifikasiLabel(KlasifikasiEmisi klas);   
+const char *getKlasifikasiLabel(KlasifikasiEmisi klas);
 
-//Function Perhitungan
+// Function Perhitungan
 float hitungTransportasi();
 float hitungListrik(EmisiListrik *dayaListrik, SumberListrik *sumberEnergi, JumlahListrik *listrik, int i);
 float hitungPeralatan();
 float hitungMakanan();
 
-//Function Display
+// Function Display
 void displayKlasifikasi(KlasifikasiEmisi klas);
 void displayTips(float emisiTransportasi, float emisiListrik, float emisiPeralatan, float emisiMakanan);
 void displayLeaderboard(Orang *data, int jumlah);
 
-int main() {
+int main()
+{
     int i, n;
     printf("========== KALKULATOR JEJAK KARBON ==========\n");
     srand(time(NULL));
 
     printf("Berapa jumlah orang yang mau mengisi? ");
     scanf("%d", &n);
-    
+
     Orang *ptrOrang;
     ptrOrang = (Orang*) malloc(n * sizeof(Orang));
   
@@ -78,7 +85,7 @@ int main() {
         printf("Nama : ");
         getchar();
         scanf("%[^\n]s", (ptrOrang + i)->nama);
-        
+
         float emisiTransportasi = hitungTransportasi();
         float emisiListrik = hitungListrik(dayaListrik, sumberEnergi, listrik, i);
         float emisiPeralatan = hitungPeralatan();
@@ -103,22 +110,34 @@ int main() {
 
 // Buat definisi tiap function di bawah sini
 
-KlasifikasiEmisi klasifikasiEmisi(float emisi){
-    if (emisi < 5.0){
+KlasifikasiEmisi klasifikasiEmisi(float emisi)
+{
+    if (emisi < 5.0)
+    {
         return RENDAH;
-    }else if (emisi < 20.0){
+    }
+    else if (emisi < 20.0)
+    {
         return NORMAL;
-    }else {
+    }
+    else
+    {
         return TINGGI;
     }
 }
 
-const char* getKlasifikasiLabel(KlasifikasiEmisi klas){
-    switch (klas){
-        case RENDAH: return "Rendah";
-        case NORMAL: return "Normal";
-        case TINGGI: return "Tinggi";
-        default: return "Tidak diketahui";
+const char *getKlasifikasiLabel(KlasifikasiEmisi klas)
+{
+    switch (klas)
+    {
+    case RENDAH:
+        return "Rendah";
+    case NORMAL:
+        return "Normal";
+    case TINGGI:
+        return "Tinggi";
+    default:
+        return "Tidak diketahui";
     }
 }
 
@@ -316,69 +335,210 @@ float hitungListrik(EmisiListrik *dayaListrik, SumberListrik *sumberEnergi, Juml
 float hitungPeralatan()
 {
     // Lampu
+    printf("=== Peralatan Lampu ===\n");
     int pilih_lampu;
-    float jml_pijar, jam_pijar;
-    float jml_neon, jam_neon;
-    float jml_led, jam_led;
-    float daya_lampu, emisi_lampu = 0;
-
-    printf("\n=== Peralatan Lampu ===\n");
+    float jml_pijar = 0, jam_pijar = 0;
+    float jml_neon = 0, jam_neon = 0;
+    float jml_led = 0, jam_led = 0;
+    float daya_lampu = 0, emisi_lampu = 0;
     printf("Lampu apa yang Anda gunakan?\n1. Pijar\n2. Neon\n3. Led\n");
-    printf("Pilih 1-3: ");
-    scanf("%d", &pilih_lampu);
-
-    switch (pilih_lampu)
+    do
     {
-    case 1:
-        printf("Jumlah lampu pijar: ");
-        scanf("%f", &jml_pijar);
-        printf("Jam pemakaian/hari: ");
-        scanf("%f", &jam_pijar);
-        daya_lampu = 65;
-        emisi_lampu = (jml_pijar * daya_lampu * jam_pijar * 365 * 0.9) / 1000000;
-        break;
-    case 2:
-        printf("Jumlah lampu neon: ");
-        scanf("%f", &jml_neon);
-        printf("Jam pemakaian/hari: ");
-        scanf("%f", &jam_neon);
-        daya_lampu = 16;
-        emisi_lampu = (jml_neon * daya_lampu * jam_neon * 365 * 0.9) / 1000000;
-        break;
-    case 3:
-        printf("Jumlah lampu led: ");
-        scanf("%f", &jml_led);
-        printf("Jam pemakaian/hari: ");
-        scanf("%f", &jam_led);
-        daya_lampu = 7;
-        emisi_lampu = (jml_led * daya_lampu * jam_led * 365 * 0.9) / 1000000;
-        break;
-    default:
-        printf("Invalid\n");
-    }
+        printf("Pilih 1-3: ");
+        if (scanf("%d", &pilih_lampu) != 1)
+        {
+            printf("Input harus angka!\n");
+            clearInputBuffer();
+            pilih_lampu = 0;
+            continue;
+        }
+        switch (pilih_lampu)
+        {
+        case 1:
+            do
+            {
+                printf("Jumlah lampu pijar: ");
+                if (scanf("%f", &jml_pijar) != 1 || jml_pijar < 0)
+                {
+                    printf("Input tidak valid!\n");
+                    clearInputBuffer();
+                    jml_pijar = -1;
+                }
+            } while (jml_pijar < 0);
+            do
+            {
+                printf("Jam pemakaian/hari: ");
+                if (scanf("%f", &jam_pijar) != 1 || jam_pijar < 0)
+                {
+                    printf("Input tidak valid!\n");
+                    clearInputBuffer();
+                    jam_pijar = -1;
+                }
+            } while (jam_pijar < 0);
+            if (jam_pijar > 24)
+            {
+                jam_pijar = 24;
+                printf("Lama pemakaian maksimal 24 jam\n");
+            }
+            daya_lampu = 65;
+            emisi_lampu = (jml_pijar * daya_lampu * jam_pijar * 365 * 0.9) / 1000000;
+            break;
+        case 2:
+            do
+            {
+                printf("Jumlah lampu neon: ");
+                if (scanf("%f", &jml_neon) != 1 || jml_neon < 0)
+                {
+                    printf("Input tidak valid!\n");
+                    clearInputBuffer();
+                    jml_neon = -1;
+                }
+            } while (jml_neon < 0);
+            do
+            {
+                printf("Jam pemakaian/hari: ");
+                if (scanf("%f", &jam_neon) != 1 || jam_neon < 0)
+                {
+                    printf("Input tidak valid!\n");
+                    clearInputBuffer();
+                    jam_neon = -1;
+                }
+            } while (jam_neon < 0);
+            if (jam_neon > 24)
+            {
+                jam_neon = 24;
+                printf("Lama pemakaian maksimal 24 jam\n");
+            }
+            daya_lampu = 16;
+            emisi_lampu = (jml_neon * daya_lampu * jam_neon * 365 * 0.9) / 1000000;
+            break;
+        case 3:
+            do
+            {
+                printf("Jumlah lampu led: ");
+                if (scanf("%f", &jml_led) != 1 || jml_led < 0)
+                {
+                    printf("Input tidak valid!\n");
+                    clearInputBuffer();
+                    jml_led = -1;
+                }
+            } while (jml_led < 0);
+            do
+            {
+                printf("Jam pemakaian/hari: ");
+                if (scanf("%f", &jam_led) != 1 || jam_led < 0)
+                {
+                    printf("Input tidak valid!\n");
+                    clearInputBuffer();
+                    jam_led = -1;
+                }
+            } while (jam_led < 0);
+            if (jam_led > 24)
+            {
+                jam_led = 24;
+                printf("Lama pemakaian maksimal 24 jam\n");
+            }
+            daya_lampu = 7;
+            emisi_lampu = (jml_led * daya_lampu * jam_led * 365 * 0.9) / 1000000;
+            break;
+        default:
+            printf("Pilihan tidak valid\n");
+        }
+    } while (pilih_lampu < 1 || pilih_lampu > 3);
 
+    // AC
     printf("\n=== Peralatan AC ===\n");
     int pilih_ac;
-    float jml_ac, jam_ac, daya_ac, emisi_ac;
+    float jml_ac = 0, jam_ac = 0, daya_ac = 0, emisi_ac = 0;
+    do
+    {
+        printf("Jumlah AC: ");
+        if (scanf("%f", &jml_ac) != 1 || jml_ac < 0)
+        {
+            printf("Input tidak valid!\n");
+            clearInputBuffer();
+            jml_ac = -1;
+        }
+    } while (jml_ac < 0);
     printf("Apakah sudah menggunakan AC dengan teknologi inverter?\n1. Ya\n2. Tidak\n");
-    printf("Pilih 1-2: ");
-    scanf("%d", &pilih_ac);
-    printf("Jumlah AC: ");
-    scanf("%f", &jml_ac);
-    printf("Jam pemakaian/hari: ");
-    scanf("%f", &jam_ac);
-    daya_ac = (pilih_ac == 1) ? 273 : 318;
-    emisi_ac = (jml_ac * daya_ac * jam_ac * 365 * 0.9) / 1000000;
+    do
+    {
+        printf("Pilih 1-2: ");
+        if (scanf("%d", &pilih_ac) != 1)
+        {
+            printf("Input harus angka!\n");
+            clearInputBuffer();
+            pilih_ac = 0;
+            continue;
+        }
+        switch (pilih_ac)
+        {
+        case 1:
+        case 2:
+            do
+            {
+                printf("Jam pemakaian/hari: ");
+                if (scanf("%f", &jam_ac) != 1 || jam_ac < 0)
+                {
+                    printf("Input tidak valid!\n");
+                    clearInputBuffer();
+                    jam_ac = -1;
+                }
+            } while (jam_ac < 0);
+            if (jam_ac > 24)
+            {
+                jam_ac = 24;
+                printf("Lama pemakaian maksimal 24 jam\n");
+            }
+            daya_ac = (pilih_ac == 1) ? 273 : 318;
+            emisi_ac = (jml_ac * daya_ac * jam_ac * 365 * 0.9) / 1000000;
+            break;
+        default:
+            printf("Pilihan tidak valid\n");
+        }
+    } while (pilih_ac < 1 || pilih_ac > 2);
 
+    // Kulkas
     printf("\n=== Peralatan Kulkas ===\n");
     int pilih_kulkas;
-    float daya_kulkas, emisi_kulkas;
+    float jml_kulkas = 0, daya_kulkas = 0, emisi_kulkas = 0;
+    do
+    {
+        printf("Jumlah kulkas: ");
+        if (scanf("%f", &jml_kulkas) != 1 || jml_kulkas < 0)
+        {
+            printf("Input tidak valid!\n");
+            clearInputBuffer();
+            jml_kulkas = -1;
+        }
+    } while (jml_kulkas < 0);
     printf("Apakah sudah menggunakan Kulkas dengan teknologi inverter?\n1. Ya\n2. Tidak\n");
-    printf("Pilih 1-2: ");
-    scanf("%d", &pilih_kulkas);
-    daya_kulkas = (pilih_kulkas == 1) ? 150 : 200;
-    emisi_kulkas = (daya_kulkas * 24 * 365 * 0.9) / 1000000;
+    do
+    {
+        printf("Pilih 1-2: ");
+        if (scanf("%d", &pilih_kulkas) != 1)
+        {
+            printf("Input harus angka!\n");
+            clearInputBuffer();
+            pilih_kulkas = 0;
+            continue;
+        }
+        switch (pilih_kulkas)
+        {
+        case 1:
+            daya_kulkas = 150;
+            emisi_kulkas = (jml_kulkas * daya_kulkas * 24 * 365 * 0.9) / 1000000;
+            break;
+        case 2:
+            daya_kulkas = 200;
+            emisi_kulkas = (jml_kulkas * daya_kulkas * 24 * 365 * 0.9) / 1000000;
+            break;
+        default:
+            printf("Pilihan tidak valid\n");
+        }
+    } while (pilih_kulkas < 1 || pilih_kulkas > 2);
 
+    // Total
     float total_emisi = emisi_lampu + emisi_ac + emisi_kulkas;
     printf("\nEmisi Karbon dari Peralatan Rumah Tangga: %.3f Ton CO2/tahun\n", total_emisi);
     return total_emisi;
@@ -534,11 +694,15 @@ void displayTips(float emisiTransportasi, float emisiListrik, float emisiPeralat
 
 
 
-void displayLeaderboard(Orang *data, int jumlah) {
-    int i,j;
-    for (i = 0; i < jumlah - 1; i++) {
-        for (j = i + 1; j < jumlah; j++) {
-            if (data[i].totalEmisi > data[j].totalEmisi) {
+void displayLeaderboard(Orang *data, int jumlah)
+{
+    int i, j;
+    for (i = 0; i < jumlah - 1; i++)
+    {
+        for (j = i + 1; j < jumlah; j++)
+        {
+            if (data[i].totalEmisi > data[j].totalEmisi)
+            {
                 Orang temp = data[i];
                 data[i] = data[j];
                 data[j] = temp;
@@ -548,8 +712,15 @@ void displayLeaderboard(Orang *data, int jumlah) {
 
     printf("Peringkat | Nama                 | Emisi (Ton CO2)| Klasifikasi\n");
     printf("----------------------------------------------------------------\n");
-    for (i = 0; i < jumlah; i++) {
+    for (i = 0; i < jumlah; i++)
+    {
         printf("   %2d     | %-20s |%6.2f          |  ", i + 1, data[i].nama, data[i].totalEmisi);
         displayKlasifikasi(data[i].klasTotalEmisi);
     }
+}
+
+void clearInputBuffer()
+{
+    int c;
+    while ((c = getchar()) != '\n' && c != EOF);
 }
