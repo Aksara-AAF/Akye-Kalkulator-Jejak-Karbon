@@ -152,7 +152,7 @@ const char *getKlasifikasiLabel(KlasifikasiEmisi klas)
 }
 
 float hitungTransportasi() {
-	int choice, vehicle, bbm, dist, trip, amount, loop;
+	int vehicle, bbm, dist, trip, amount, loop;
     float x = 0, emisi = 0, emisiM = 0, emisiDarat = 0, emisiUdara = 0;
 	
 	printf("Ada berapa kendaraan darat (Mobil & Motor) yang digunakan? ");
