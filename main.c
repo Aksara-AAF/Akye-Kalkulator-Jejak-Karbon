@@ -76,9 +76,13 @@ int main()
     Orang *ptrOrang;
     ptrOrang = (Orang*) malloc(n * sizeof(Orang));
   
-    EmisiListrik dayaListrik[n];
-    SumberListrik sumberEnergi[n];
-    JumlahListrik listrik[n];
+    EmisiListrik *dayaListrik = (EmisiListrik*) malloc(n * sizeof(EmisiListrik));
+    SumberListrik *sumberEnergi = (SumberListrik*) malloc(n * sizeof(SumberListrik));
+    JumlahListrik *listrik = (JumlahListrik*) malloc(n * sizeof(JumlahListrik));
+    if (ptrOrang == NULL || dayaListrik == NULL || sumberEnergi == NULL || listrik == NULL) {
+        printf("Gagal mengalokasikan memori.\n");
+        return 1;
+    }
 
     for (i = 0; i < n; i++){
         printf("\n=== Orang ke-%d ===\n", i+1);
@@ -105,6 +109,9 @@ int main()
     displayLeaderboard(ptrOrang, n);
 
     free(ptrOrang);
+    free(dayaListrik);
+    free(sumberEnergi);
+    free(listrik);
     return 0;
 }
 
