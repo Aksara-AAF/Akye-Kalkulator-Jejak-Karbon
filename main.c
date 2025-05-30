@@ -642,12 +642,6 @@ float hitungMakanan() {
         0.987, 2.687
     };
 
-    // Assign value namaMakanan dan emisiPerPorsi untuk array daftarMakanan
-    for (int i = 0; i < jumlahMakanan; i++) {
-        daftarMakanan[i].namaMakanan = strdup(namaList[i]); // malloc + copy
-        daftarMakanan[i].emisiPerPorsi = emisiList[i];
-    }
-
     // Alokasi dinamis untuk frekuensi
     int* frekuensi = (int*) malloc(jumlahMakanan * sizeof(int));
     if (frekuensi == NULL) {
@@ -661,6 +655,9 @@ float hitungMakanan() {
     printf("Masukkan frekuensi konsumsi tiap makanan per minggu (0-21 kali/porsi):\n");
 
     for (int i = 0; i < jumlahMakanan; i++) {
+        // Assign value namaMakanan dan emisiPerPorsi untuk array daftarMakanan
+        daftarMakanan[i].namaMakanan = strdup(namaList[i]); // malloc + copy
+        daftarMakanan[i].emisiPerPorsi = emisiList[i];
         do {
             printf("%s : ", daftarMakanan[i].namaMakanan);
             if (scanf("%d", &frekuensi[i]) != 1) {
