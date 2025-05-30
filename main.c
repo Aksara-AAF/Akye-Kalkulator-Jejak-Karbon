@@ -152,95 +152,120 @@ const char *getKlasifikasiLabel(KlasifikasiEmisi klas)
 }
 
 float hitungTransportasi() {
-	int vehicle, bbm, dist, trip, amount, loop;
+    int vehicle, bbm, dist, trip, amount, loop;
     float x = 0, emisi = 0, emisiM = 0, emisiDarat = 0, emisiUdara = 0;
-	
-	printf("Ada berapa kendaraan darat (Mobil & Motor) yang digunakan? ");
-	scanf("%d", &amount); 
-	for(loop = 0 ; loop < amount ; loop++){
-		printf("\n");
-		printf("Apa kendaraan ke-%d ?\n1. Mobil\n2. Motor\n", loop + 1);
-	    scanf("%d", &vehicle);
-		switch(vehicle){
-	    	case 1:
-	    		do{
-		            printf("Bahan bakar apa yang digunakan?\n1. Bensin\n2. Listrik\n");
-		            scanf("%d", &bbm);
-		            if(bbm == 1) x = 0.08760;
-		            else if(bbm == 2) x = 0.03053;
-		            else{
-		            	printf("Bahan bakar tidak tersedia, ulangi.\n");
-					}
-	        	}while(bbm > 2 || bbm < 1);
-	        	do{
-		            printf("Berapa jarak yang ditempuh per hari (KM/Hari)? ");
-		            scanf("%d", &dist);
-		            if(dist <= 0){
-		            	printf("Jarak tidak bisa 0 atau lebih rendah.\n");
-					}
-	            }while(dist <= 0);
-	            emisiM = dist * x;
-	            emisiDarat += emisiM;
-	            break;
-			case 2:
-				do{
-		            printf("Bahan bakar apa yang digunakan?\n1. Bensin\n2. Listrik\n");
-		            scanf("%d", &bbm);
-		            if(bbm == 1) x = 0.03503;
-		            else if(bbm == 2) x = 0.0213;
-		            else {
-		                printf("Bahan tidak terdaftar, mohon coba lagi.\n");
-		            }
-	        	}while(bbm > 2 || bbm < 1);
-	        	do{
-		            printf("Berapa jarak yang ditempuh per hari (KM/Hari)? ");
-		            scanf("%d", &dist);
-		            if(dist <= 0){
-		            	printf("Jarak tidak bisa 0 atau lebih rendah.\n");
-					}
-	            }while(dist <= 0);
-	            emisiM = dist * x;
-	            emisiDarat += emisiM;
-	            break;
-	
-	        default:
-	            printf("Kendaraan tidak terdaftar.\n");
-	            loop--;
-	            }
+    
+    // Validated input for jumlah kendaraan darat
+    do {
+        printf("Ada berapa kendaraan darat (Mobil & Motor) yang digunakan? ");
+        if (scanf("%d", &amount) != 1 || amount < 0) {
+            printf("Input tidak valid!\n");
+            clearInputBuffer();
+            amount = -1;
+        }
+    } while (amount < 0);
+    for(loop = 0 ; loop < amount ; loop++){
+        printf("\n");
+        do {
+            printf("Apa kendaraan ke-%d ?\n1. Mobil\n2. Motor\n", loop + 1);
+            if (scanf("%d", &vehicle) != 1 || (vehicle != 1 && vehicle != 2)) {
+                printf("Kendaraan tidak terdaftar.\n");
+                clearInputBuffer();
+                vehicle = 0;
+            }
+        } while (vehicle != 1 && vehicle != 2);
+        switch(vehicle){
+            case 1:
+                do{
+                    printf("Bahan bakar apa yang digunakan?\n1. Bensin\n2. Listrik\n");
+                    if (scanf("%d", &bbm) != 1 || (bbm != 1 && bbm != 2)) {
+                        printf("Bahan bakar tidak tersedia, ulangi.\n");
+                        clearInputBuffer();
+                        bbm = 0;
+                    }
+                    if(bbm == 1) x = 0.08760;
+                    else if(bbm == 2) x = 0.03053;
+                }while(bbm != 1 && bbm != 2);
+                do{
+                    printf("Berapa jarak yang ditempuh per hari (KM/Hari)? ");
+                    if (scanf("%d", &dist) != 1 || dist <= 0) {
+                        printf("Jarak tidak bisa 0 atau lebih rendah.\n");
+                        clearInputBuffer();
+                        dist = -1;
+                    }
+                }while(dist <= 0);
+                emisiM = dist * x;
+                emisiDarat += emisiM;
+                break;
+            case 2:
+                do{
+                    printf("Bahan bakar apa yang digunakan?\n1. Bensin\n2. Listrik\n");
+                    if (scanf("%d", &bbm) != 1 || (bbm != 1 && bbm != 2)) {
+                        printf("Bahan tidak terdaftar, mohon coba lagi.\n");
+                        clearInputBuffer();
+                        bbm = 0;
+                    }
+                    if(bbm == 1) x = 0.03503;
+                    else if(bbm == 2) x = 0.0213;
+                }while(bbm != 1 && bbm != 2);
+                do{
+                    printf("Berapa jarak yang ditempuh per hari (KM/Hari)? ");
+                    if (scanf("%d", &dist) != 1 || dist <= 0) {
+                        printf("Jarak tidak bisa 0 atau lebih rendah.\n");
+                        clearInputBuffer();
+                        dist = -1;
+                    }
+                }while(dist <= 0);
+                emisiM = dist * x;
+                emisiDarat += emisiM;
+                break;
+        }
     }
     printf("Emisi Karbon dari Kendaraan Darat: %.3f Ton CO2/tahun\n", emisiDarat);
     
-	printf("\n");
-	do{
-		printf("Apakah menggunakan kendaraan udara (Pesawat)?\n1. Iya\n2. Tidak\n");
-		scanf("%d", &amount);
-		switch(amount){
-			case 1:
-				printf("Jenis perjalanan udara:\n1. One-Way Trip\n2. Roundtrip\n");
-			    scanf("%d", &vehicle);
-			    if(vehicle == 1) trip = 1;
-			    else if(vehicle == 2) trip = 2;
-			    else {
-			    	printf("Pilihan tidak valid. Diasumsikan one-way trip.\n");
-			        trip = 1;
-				}		 
-			
-			    printf("Berapa sering perjalanan dilakukan? ");
-			    scanf("%d", &bbm);
-			    printf("Berapa jarak yang ditempuh (KM/perjalanan)? ");
-			    scanf("%d", &dist);
-				break;
-				
-			case 2:
-				trip = 0;
-				bbm = 0;
-				dist = 0;
-				break;
-			
-			default:
-				printf("Opsi tidak valid.\n");
-		}
-	}while(amount > 2 || amount < 1);
+    printf("\n");
+    do{
+        printf("Apakah menggunakan kendaraan udara (Pesawat)?\n1. Iya\n2. Tidak\n");
+        if (scanf("%d", &amount) != 1 || (amount != 1 && amount != 2)) {
+            printf("Opsi tidak valid.\n");
+            clearInputBuffer();
+            amount = 0;
+        }
+        switch(amount){
+            case 1:
+                do {
+                    printf("Jenis perjalanan udara:\n1. One-Way Trip\n2. Roundtrip\n");
+                    if (scanf("%d", &vehicle) != 1 || (vehicle != 1 && vehicle != 2)) {
+                        printf("Pilihan tidak valid. Diasumsikan one-way trip.\n");
+                        clearInputBuffer();
+                        vehicle = 1;
+                    }
+                } while (vehicle != 1 && vehicle != 2);
+                trip = (vehicle == 2) ? 2 : 1;
+                do {
+                    printf("Berapa sering perjalanan dilakukan? ");
+                    if (scanf("%d", &bbm) != 1 || bbm < 0) {
+                        printf("Input tidak valid!\n");
+                        clearInputBuffer();
+                        bbm = -1;
+                    }
+                } while (bbm < 0);
+                do {
+                    printf("Berapa jarak yang ditempuh (KM/perjalanan)? ");
+                    if (scanf("%d", &dist) != 1 || dist < 0) {
+                        printf("Input tidak valid!\n");
+                        clearInputBuffer();
+                        dist = -1;
+                    }
+                } while (dist < 0);
+                break;
+            case 2:
+                trip = 0;
+                bbm = 0;
+                dist = 0;
+                break;
+        }
+    }while(amount != 1 && amount != 2);
     emisiUdara = trip * dist * 0.000156 * bbm;
     printf("Emisi Karbon dari Kendaraan Udara: %.3f Ton CO2/tahun\n", emisiUdara);
     emisi = emisiDarat + emisiUdara;
@@ -254,13 +279,18 @@ float hitungListrik(EmisiListrik *dayaListrik, SumberListrik *sumberEnergi, Juml
     printf("\n=== Hitung Emisi Listrik ===\n");
 
     // Input jumlah orang yang tinggal di rumah
-    do {
+    int valid = 0;
+    while (!valid) {
         printf("Berapa jumlah orang yang tinggal di rumah? ");
-        scanf("%d", &dayaListrik[i].orgRumah);
-        if (dayaListrik[i].orgRumah <= 0) {
+        if (scanf("%d", &dayaListrik[i].orgRumah) != 1) {
+            printf("Input tidak valid!\n");
+            clearInputBuffer();
+        } else if (dayaListrik[i].orgRumah <= 0) {
             printf("Jumlah orang harus lebih dari 0.\n");
+        } else {
+            valid = 1;
         }
-    } while (dayaListrik[i].orgRumah <= 0);
+    }
 
     // Input tipe sumber listrik
     printf("Tipe Sumber Listrik:\n");
@@ -268,11 +298,12 @@ float hitungListrik(EmisiListrik *dayaListrik, SumberListrik *sumberEnergi, Juml
     printf("2. Bersih (100%%)\n");
     printf("3. Hybrid\n");
     do {
-        scanf("%d", &dayaListrik[i].tipeSumberListrik);
-        if (dayaListrik[i].tipeSumberListrik < 1 || dayaListrik[i].tipeSumberListrik > 3) {
+        printf("Pilih tipe sumber listrik (1-3): ");
+        if (scanf("%d", &dayaListrik[i].tipeSumberListrik) != 1 || dayaListrik[i].tipeSumberListrik < 1 || dayaListrik[i].tipeSumberListrik > 3) {
             printf("Pilihan tidak valid. Silakan coba lagi.\n");
+            clearInputBuffer();
+            dayaListrik[i].tipeSumberListrik = 0;
         }
-
     } while (dayaListrik[i].tipeSumberListrik < 1 || dayaListrik[i].tipeSumberListrik > 3);
 
     switch(dayaListrik[i].tipeSumberListrik) {
@@ -287,17 +318,19 @@ float hitungListrik(EmisiListrik *dayaListrik, SumberListrik *sumberEnergi, Juml
             printf("1. 450 Watt\n2. 900 Watt\n3. 1300 Watt\n4. 2200 Watt\n5. 3500 Watt\n6. 5500 Watt\n7. >6600 Watt\n");
             do {
                 printf("Pilih kategori daya (1-7): ");
-                scanf("%d", &dayaListrik[i].kategoriDaya);
-                if (dayaListrik[i].kategoriDaya < 1 || dayaListrik[i].kategoriDaya > 7) {
+                if (scanf("%d", &dayaListrik[i].kategoriDaya) != 1 || dayaListrik[i].kategoriDaya < 1 || dayaListrik[i].kategoriDaya > 7) {
                     printf("Kategori daya tidak valid. Silakan coba lagi.\n");
+                    clearInputBuffer();
+                    dayaListrik[i].kategoriDaya = 0;
                 }
             } while (dayaListrik[i].kategoriDaya < 1 || dayaListrik[i].kategoriDaya > 7);
 
             do {
                 printf("Berapa tagihan listrik per bulan (Rp)? ");
-                scanf("%d", &dayaListrik[i].tagihanListrik);
-                if (dayaListrik[i].tagihanListrik <= 0) {
+                if (scanf("%d", &dayaListrik[i].tagihanListrik) != 1 || dayaListrik[i].tagihanListrik <= 0) {
                     printf("Tagihan listrik tidak bisa negatif. Silakan coba lagi.\n");
+                    clearInputBuffer();
+                    dayaListrik[i].tagihanListrik = 0;
                 }
             } while (dayaListrik[i].tagihanListrik <= 0);
 
@@ -315,9 +348,10 @@ float hitungListrik(EmisiListrik *dayaListrik, SumberListrik *sumberEnergi, Juml
         case BERSIH:
             do {
                 printf("Berapa banyak listrik yang dihasilkan sumber energi bersih (dalam kWh)? ");
-                scanf("%f", &dayaBersih);
-                if (dayaBersih < 0) {
+                if (scanf("%f", &dayaBersih) != 1 || dayaBersih < 0) {
                     printf("Daya bersih tidak bisa negatif. Silakan coba lagi.\n");
+                    clearInputBuffer();
+                    dayaBersih = -1;
                 }
             } while (dayaBersih < 0);
             listrik[i].bersih = dayaBersih;
@@ -331,17 +365,19 @@ float hitungListrik(EmisiListrik *dayaListrik, SumberListrik *sumberEnergi, Juml
             printf("1. 450 Watt\n2. 900 Watt\n3. 1300 Watt\n4. 2200 Watt\n5. 3500 Watt\n6. 5500 Watt\n7. >6600 Watt\n");
             do {
                 printf("Pilih kategori daya (1-7): ");
-                scanf("%d", &dayaListrik[i].kategoriDaya);
-                if (dayaListrik[i].kategoriDaya < 1 || dayaListrik[i].kategoriDaya > 7) {
+                if (scanf("%d", &dayaListrik[i].kategoriDaya) != 1 || dayaListrik[i].kategoriDaya < 1 || dayaListrik[i].kategoriDaya > 7) {
                     printf("Kategori daya tidak valid. Silakan coba lagi.\n");
+                    clearInputBuffer();
+                    dayaListrik[i].kategoriDaya = 0;
                 }
             } while (dayaListrik[i].kategoriDaya < 1 || dayaListrik[i].kategoriDaya > 7);
 
             do {
                 printf("Berapa tagihan listrik per bulan (Rp)? ");
-                scanf("%d", &dayaListrik[i].tagihanListrik);
-                if (dayaListrik[i].tagihanListrik <= 0) {
+                if (scanf("%d", &dayaListrik[i].tagihanListrik) != 1 || dayaListrik[i].tagihanListrik <= 0) {
                     printf("Tagihan listrik tidak bisa negatif. Silakan coba lagi.\n");
+                    clearInputBuffer();
+                    dayaListrik[i].tagihanListrik = 0;
                 }
             } while (dayaListrik[i].tagihanListrik <= 0);
 
@@ -353,9 +389,10 @@ float hitungListrik(EmisiListrik *dayaListrik, SumberListrik *sumberEnergi, Juml
 
             do {
                 printf("Berapa banyak listrik yang dihasilkan sumber energi bersih (dalam kWh)? ");
-                scanf("%f", &dayaBersih);
-                if (dayaBersih < 0) {
+                if (scanf("%f", &dayaBersih) != 1 || dayaBersih < 0) {
                     printf("Daya bersih tidak bisa negatif. Silakan coba lagi.\n");
+                    clearInputBuffer();
+                    dayaBersih = -1;
                 }
             } while (dayaBersih < 0);
 
@@ -626,9 +663,11 @@ float hitungMakanan() {
     for (int i = 0; i < jumlahMakanan; i++) {
         do {
             printf("%s : ", daftarMakanan[i].namaMakanan);
-            scanf("%d", &frekuensi[i]);
-
-            if (frekuensi[i] < 0 || frekuensi[i] > 21) {
+            if (scanf("%d", &frekuensi[i]) != 1) {
+                printf("Input tidak valid!\n");
+                clearInputBuffer();
+                frekuensi[i] = -1;
+            } else if (frekuensi[i] < 0 || frekuensi[i] > 21) {
                 printf("Jumlah frekuensi tidak valid. Masukkan antara 0-21.\n");
             }
         } while (frekuensi[i] < 0 || frekuensi[i] > 21);
