@@ -127,8 +127,7 @@ KlasifikasiEmisi klasifikasiEmisi(float emisi) {
     }
 }
 
-const char *getKlasifikasiLabel(KlasifikasiEmisi klas)
-{
+const char *getKlasifikasiLabel(KlasifikasiEmisi klas) {
     switch (klas){
     case RENDAH:
         return "Rendah";
