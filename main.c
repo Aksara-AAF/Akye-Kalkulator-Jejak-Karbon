@@ -97,7 +97,7 @@ int main() {
         (ptrOrang + i)->totalEmisi = total;
         (ptrOrang + i)->klasTotalEmisi = klasifikasiEmisi(total);
         
-        printf("\nTotal Emisi Karbon: %.2f kg CO2\n", total);
+        printf("\nTotal Emisi Karbon: %.2f Ton CO2/Tahun\n", total);
 
         displayTips(emisiTransportasi, emisiListrik, emisiPeralatan, emisiMakanan);
 
@@ -210,7 +210,7 @@ float hitungTransportasi() {
                 break;
         }
     }
-    printf("Emisi Karbon dari Kendaraan Darat: %.3f Ton CO2/tahun\n", emisiDarat);
+    printf("Emisi Karbon dari Kendaraan Darat: %.3f Ton CO2/Tahun\n", emisiDarat);
     
     printf("\n");
     do{
@@ -256,7 +256,7 @@ float hitungTransportasi() {
         }
     }while(amount != 1 && amount != 2);
     emisiUdara = trip * dist * 0.000156 * bbm;
-    printf("Emisi Karbon dari Kendaraan Udara: %.3f Ton CO2/tahun\n", emisiUdara);
+    printf("Emisi Karbon dari Kendaraan Udara: %.3f Ton CO2/Tahun\n", emisiUdara);
     emisi = emisiDarat + emisiUdara;
     printf("\nTotal Emisi Karbon dari Kedua Tipe Kendaraan: %.3f Ton CO2/Tahun", emisi);
     return emisi;
@@ -331,7 +331,7 @@ float hitungListrik(EmisiListrik *dayaListrik, SumberListrik *sumberEnergi, Juml
             listrik[i].pln = dayaBulan;
             dayaListrik[i].listrikPLN = listrik[i].pln;
             dayaListrik[i].totalEmisiListrik = listrik[i].pln * 0.01 * 0.984;
-            printf("Emisi Karbon dari Daya Rumah Tangga: %.3f Ton CO2/tahun\n", dayaListrik[i].totalEmisiListrik / dayaListrik[i].orgRumah);
+            printf("Emisi Karbon dari Daya Rumah Tangga: %.3f Ton CO2/Tahun\n", dayaListrik[i].totalEmisiListrik / dayaListrik[i].orgRumah);
             return dayaListrik[i].totalEmisiListrik / dayaListrik[i].orgRumah;
 
         case BERSIH:
@@ -346,7 +346,7 @@ float hitungListrik(EmisiListrik *dayaListrik, SumberListrik *sumberEnergi, Juml
             listrik[i].bersih = dayaBersih;
             dayaListrik[i].listrikBersih = listrik[i].bersih;
             dayaListrik[i].totalEmisiListrik = listrik[i].bersih * 0;
-            printf("Emisi Karbon dari Daya Rumah Tangga: %.3f Ton CO2/tahun\n", dayaListrik[i].totalEmisiListrik / dayaListrik[i].orgRumah);
+            printf("Emisi Karbon dari Daya Rumah Tangga: %.3f Ton CO2/Tahun\n", dayaListrik[i].totalEmisiListrik / dayaListrik[i].orgRumah);
             return dayaListrik[i].totalEmisiListrik / dayaListrik[i].orgRumah;
 
         case HYBRID:
@@ -388,7 +388,7 @@ float hitungListrik(EmisiListrik *dayaListrik, SumberListrik *sumberEnergi, Juml
             listrik[i].hybrid = dayaBulan + dayaBersih * 0;
             dayaListrik[i].listrikHybrid = listrik[i].hybrid;
             dayaListrik[i].totalEmisiListrik = listrik[i].hybrid * 0.01 * 0.984;
-            printf("Emisi Karbon dari Daya Rumah Tangga: %.3f Ton CO2/tahun\n", dayaListrik[i].totalEmisiListrik / dayaListrik[i].orgRumah);
+            printf("Emisi Karbon dari Daya Rumah Tangga: %.3f Ton CO2/Tahun\n", dayaListrik[i].totalEmisiListrik / dayaListrik[i].orgRumah);
             return dayaListrik[i].totalEmisiListrik / dayaListrik[i].orgRumah;
 
         default:
@@ -575,7 +575,7 @@ float hitungPeralatan() {
 
     // Total
     float total_emisi = emisi_lampu + emisi_ac + emisi_kulkas;
-    printf("\nEmisi Karbon dari Peralatan Rumah Tangga: %.3f Ton CO2/tahun\n", total_emisi);
+    printf("\nEmisi Karbon dari Peralatan Rumah Tangga: %.3f Ton CO2/Tahun\n", total_emisi);
     return total_emisi;
 }
 
@@ -634,7 +634,7 @@ float hitungMakanan() {
     }
 
     totalEmisiMakanan /= 1000; // dari kg ke ton
-    printf("Emisi Karbon dari Makanan : %.3f Ton CO2/tahun\n", totalEmisiMakanan);
+    printf("Emisi Karbon dari Makanan : %.3f Ton CO2/Tahun\n", totalEmisiMakanan);
 
     // Free memori
     for (int i = 0; i < jumlahMakanan; i++) {
